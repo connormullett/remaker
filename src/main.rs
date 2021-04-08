@@ -4,6 +4,19 @@ use std::{env, fs, io, process};
 
 const REMAKE_FILE_NAME: &'static str = "remaker";
 
+#[derive(Debug)]
+struct Rule {
+    targets: Vec<String>,
+    dependencies: Vec<String>,
+    build_steps: Vec<String>,
+}
+
+type Rules = Vec<Rule>;
+
+fn parse_remake_file(remake_file_contents: String) -> Rules {
+    Rules::new()
+}
+
 fn find_remake_file() -> io::Result<PathBuf> {
     let mut current_dir = env::current_dir()?;
     current_dir.push(REMAKE_FILE_NAME);
@@ -41,5 +54,7 @@ fn main() {
         Err(error) => return error_and_die(Box::new(error)),
     };
 
-    println!("{}", remake_file_contents);
+    let rules = parse_remake_file(remake_file_contents);
+
+    println!("{:?}", rules);
 }
