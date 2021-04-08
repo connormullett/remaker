@@ -1,10 +1,10 @@
-use std::{env::current_exe, path::PathBuf};
+use std::path::PathBuf;
 
 use std::env;
 use std::io;
 use std::process;
 
-const REMAKE_FILE_NAME: &'static str = "remake";
+const REMAKE_FILE_NAME: &'static str = "remaker";
 
 fn find_remake_file() -> io::Result<PathBuf> {
     let mut current_dir = env::current_dir()?;
@@ -28,4 +28,6 @@ fn main() {
             process::exit(1);
         }
     };
+
+    println!("remake_file {:?}", remake_file);
 }
