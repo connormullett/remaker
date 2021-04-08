@@ -1,8 +1,6 @@
-use std::path::PathBuf;
+use std::{error::Error, path::PathBuf};
 
-use std::env;
-use std::io;
-use std::process;
+use std::{env, fs, io, process};
 
 const REMAKE_FILE_NAME: &'static str = "remaker";
 
@@ -20,14 +18,28 @@ fn find_remake_file() -> io::Result<PathBuf> {
     Ok(current_dir)
 }
 
+fn read_remake_file(path: PathBuf) -> io::Result<String> {
+    let buffer = fs::read_to_string(path)?;
+    Ok(buffer)
+}
+
+fn error_and_die(error: Box<dyn Error>) {
+    println!("{}", error);
+    process::exit(1);
+}
+
 fn main() {
-    let remake_file = match find_remake_file() {
+    let remake_file_path = match find_remake_file() {
         Ok(file) => file,
         Err(error) => {
-            println!("{}", error);
-            process::exit(1);
+            return error_and_die(Box::new(error));
         }
     };
 
-    println!("remake_file {:?}", remake_file);
+    let remake_file_contents = match read_remake_file(remake_file_path) {
+        Ok(content) => content,
+        Err(error) => return error_and_die(Box::new(error)),
+    };
+
+    println!("{}", remake_file_contents);
 }
