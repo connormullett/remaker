@@ -22,3 +22,13 @@ impl Rule {
         }
     }
 }
+
+pub enum ParseStatus {
+    Complete,
+    Incomplete,
+}
+
+pub enum ParseResult<R, S> {
+    Ok(R, S),
+    Err(S),
+}

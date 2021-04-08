@@ -44,7 +44,7 @@ fn main() {
         Err(error) => return error_and_die(Box::new(error)),
     };
 
-    let rules = parse::parse_remake_file(remake_file_contents);
+    let rules = parse::parse_remake_file(&remake_file_contents);
 
     println!("{:?}", rules);
 }
