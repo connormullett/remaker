@@ -2,8 +2,14 @@ use crate::types::{ParseResult, ParseStatus, Rule, Rules};
 
 // TODO: expand and handle wildcards
 
-fn parse_target(_input: &str) -> Vec<String> {
-    vec![]
+fn parse_target_line(input: &str) -> ParseResult<Vec<String>, ParseStatus> {
+    if !is_valid_rule_header(input.clone()) {
+        return ParseResult::Err(ParseStatus::Error);
+    }
+
+    let inner = input.split(':').map(|item| item.to_string()).collect();
+
+    ParseResult::Ok(inner, ParseStatus::Complete)
 }
 
 fn parse_rules(input: &str) -> Rules {
@@ -18,7 +24,7 @@ fn parse_rules(input: &str) -> Rules {
 }
 
 fn parse_rule(_input: &str) -> Rule {
-    let _ = parse_target("");
+    let _ = parse_target_line("");
     let _ = parse_build_steps("");
     Rule::from(vec![], vec![], vec![])
 }
@@ -45,6 +51,6 @@ fn parse_build_steps(input: &str) -> ParseResult<Vec<String>, ParseStatus> {
     ParseResult::Ok(build_steps, ParseStatus::Complete)
 }
 
-pub fn parse_remake_file(_remake_file_contents: &str) -> Rules {
-    parse_rules("")
+pub fn parse_remake_file(remake_file_contents: &str) -> Rules {
+    parse_rules(remake_file_contents)
 }

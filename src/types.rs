@@ -26,6 +26,7 @@ impl Rule {
 pub enum ParseStatus {
     Complete,
     Incomplete,
+    Error,
 }
 
 pub enum ParseResult<R, S> {
