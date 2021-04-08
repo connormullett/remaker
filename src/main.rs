@@ -1,19 +1,41 @@
-use std::{error::Error, path::PathBuf};
+use std::{
+    error::Error,
+    path::{Path, PathBuf},
+};
 
 use std::{env, fs, io, process};
 
-const REMAKE_FILE_NAME: &'static str = "remaker";
+const REMAKE_FILE_NAME: &str = "remaker";
 
 #[derive(Debug)]
 struct Rule {
-    targets: Vec<String>,
-    dependencies: Vec<String>,
+    targets: Vec<Box<Path>>,
+    dependencies: Vec<Box<Path>>,
     build_steps: Vec<String>,
+}
+
+impl Rule {
+    pub fn from(
+        targets: Vec<Box<Path>>,
+        dependencies: Vec<Box<Path>>,
+        build_steps: Vec<String>,
+    ) -> Self {
+        Self {
+            targets,
+            dependencies,
+            build_steps,
+        }
+    }
 }
 
 type Rules = Vec<Rule>;
 
-fn parse_remake_file(remake_file_contents: String) -> Rules {
+fn parse_rule(_input: String) -> Rule {
+    Rule::from(vec![], vec![], vec![])
+}
+
+fn parse_remake_file(_remake_file_contents: String) -> Rules {
+    parse_rule(String::new());
     Rules::new()
 }
 
