@@ -1,24 +1,33 @@
-use std::path::Path;
+pub type Rules = Vec<Rule>;
+#[derive(Debug, PartialEq, Eq)]
+pub struct Target {
+    pub targets: Vec<String>,
+    pub dependencies: Vec<String>,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct VariableAssignment {
+    symbol: String,
+    value: String,
+}
+
+impl From<(&str, &str)> for Target {
+    fn from(i: (&str, &str)) -> Self {
+        Self {
+            targets: i.0.split(' ').map(|target| target.to_string()).collect(),
+            dependencies: i
+                .1
+                .trim()
+                .split(' ')
+                .map(|target| target.to_string())
+                .collect(),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct Rule {
-    targets: Vec<Box<Path>>,
-    dependencies: Option<Vec<Box<Path>>>,
-    build_steps: Vec<String>,
-}
-
-pub type Rules = Vec<Rule>;
-
-impl Rule {
-    pub fn from(
-        targets: Vec<Box<Path>>,
-        dependencies: Vec<Box<Path>>,
-        build_steps: Vec<String>,
-    ) -> Self {
-        Self {
-            targets,
-            build_steps,
-            dependencies: Some(dependencies),
-        }
-    }
+    pub targets: Vec<Box<String>>,
+    pub dependencies: Vec<Box<String>>,
+    pub build_steps: Vec<String>,
 }

@@ -1,4 +1,5 @@
 use nom::{
+    branch::permutation,
     bytes::{
         complete::{tag, take_till},
         streaming::take_until,
@@ -9,33 +10,9 @@ use nom::{
     IResult,
 };
 
+use crate::types::{Rule, Rules, Target, VariableAssignment};
+
 type Res<T, U> = IResult<T, U, VerboseError<T>>;
-
-#[derive(Debug, PartialEq, Eq)]
-struct Target {
-    targets: Vec<String>,
-    dependencies: Vec<String>,
-}
-
-impl From<(&str, &str)> for Target {
-    fn from(i: (&str, &str)) -> Self {
-        Self {
-            targets: i.0.split(' ').map(|target| target.to_string()).collect(),
-            dependencies: i
-                .1
-                .trim()
-                .split(' ')
-                .map(|target| target.to_string())
-                .collect(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-struct VariableAssignment {
-    symbol: String,
-    value: String,
-}
 
 fn parse_variable_assignment(input: &str) -> Res<&str, VariableAssignment> {
     context(
@@ -82,6 +59,31 @@ fn parse_build_command(input: &str) -> Res<&str, &str> {
         delimited(tag("\t"), take_until("\n"), tag("\n")),
     )(input)
 }
+
+fn parse_rule(input: &str) -> Res<&str, Rule> {
+    permutation((parse_target_line, parse_build_commands))(input).map(|(next_input, res)| {
+        (
+            next_input,
+            Rule {
+                targets: res
+                    .0
+                    .targets
+                    .iter()
+                    .map(|i| Box::new(i.to_string()))
+                    .collect(),
+                dependencies: res
+                    .0
+                    .dependencies
+                    .iter()
+                    .map(|i| Box::new(i.to_string()))
+                    .collect(),
+                build_steps: res.1.iter().map(|&i| i.to_string()).collect(),
+            },
+        )
+    })
+}
+
+fn parse_remake_file(input: &str) {}
 
 #[cfg(test)]
 mod test {
