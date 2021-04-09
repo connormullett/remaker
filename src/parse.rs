@@ -83,6 +83,7 @@ fn parse_rule(input: &str) -> Res<&str, Rule> {
     })
 }
 
+// TODO: maybe a full struct with rules and variables
 fn parse_remake_file(input: &str) {}
 
 #[cfg(test)]
