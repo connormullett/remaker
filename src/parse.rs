@@ -43,6 +43,22 @@ struct ListAssignment {
     value: Vec<String>,
 }
 
+fn parse_variable_assignment(input: &str) -> Res<&str, VariableAssignment> {
+    context(
+        "parse_variable_assignment",
+        separated_pair(take_until("="), tag("="), take_till(|c| c == '\n')),
+    )(input)
+    .map(|(next_input, res)| {
+        (
+            next_input,
+            VariableAssignment {
+                symbol: res.0.trim().to_string(),
+                value: res.1.trim().to_string(),
+            },
+        )
+    })
+}
+
 fn parse_target_line(input: &str) -> Res<&str, Target> {
     context(
         "target_line",
@@ -95,7 +111,6 @@ mod test {
     fn test_parse_build_commands() {
         let build_commands = "\n\tgcc foo.c -o foo.o\n\techo it worked";
         let actual = parse_build_commands(build_commands);
-        println!("actual {:?}", actual);
 
         assert!(actual.is_ok())
     }
@@ -106,5 +121,14 @@ mod test {
         let actual = parse_build_command(build_command);
 
         assert_eq!(actual.unwrap(), ("", "gcc foo.c -o foo.o"));
+    }
+
+    #[test]
+    fn test_parse_variable_assignment() {
+        let input = "foo = value";
+        let actual = parse_variable_assignment(input);
+        println!("actual {:?}", actual);
+
+        assert!(actual.is_ok())
     }
 }
