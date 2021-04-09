@@ -39,12 +39,11 @@ fn main() {
         }
     };
 
-    let remake_file_contents = match read_remake_file(remake_file_path) {
+    let _remake_file_contents = match read_remake_file(remake_file_path) {
         Ok(content) => content,
         Err(error) => return error_and_die(Box::new(error)),
     };
 
-    let rules = parse::parse_remake_file(&remake_file_contents);
-
-    println!("{:?}", rules);
+    // let rules = parse::parse_remake_file(&remake_file_contents);
+    // println!("{:?}", rules);
 }

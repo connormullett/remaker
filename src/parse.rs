@@ -1,56 +1,87 @@
-use crate::types::{ParseResult, ParseStatus, Rule, Rules};
+use nom::{
+    bytes::{complete::tag, streaming::take_until},
+    error::{context, VerboseError},
+    multi::many_till,
+    sequence::{delimited, separated_pair},
+    IResult,
+};
 
-// TODO: expand and handle wildcards
+type Res<T, U> = IResult<T, U, VerboseError<T>>;
 
-fn parse_target_line(input: &str) -> ParseResult<Vec<String>, ParseStatus> {
-    if !is_valid_rule_header(input.clone()) {
-        return ParseResult::Err(ParseStatus::Error);
-    }
-
-    let inner = input.split(':').map(|item| item.to_string()).collect();
-
-    ParseResult::Ok(inner, ParseStatus::Complete)
+#[derive(Debug, PartialEq, Eq)]
+struct Target {
+    targets: Vec<String>,
+    dependencies: Vec<String>,
 }
 
-fn parse_rules(input: &str) -> Rules {
-    let lines = input.split('\n');
-    let output = Vec::new();
-
-    for line in lines {
-        parse_rule(line);
-    }
-
-    output
-}
-
-fn parse_rule(_input: &str) -> Rule {
-    let _ = parse_target_line("");
-    let _ = parse_build_steps("");
-    Rule::from(vec![], vec![], vec![])
-}
-
-fn is_valid_rule_header(input: &str) -> bool {
-    input.split(':').collect::<Vec<&str>>().len() == 2
-}
-
-fn parse_build_steps(input: &str) -> ParseResult<Vec<String>, ParseStatus> {
-    let mut lines = input.split('\n');
-    let mut build_steps = Vec::new();
-
-    for line in &mut lines {
-        if !line.starts_with('\t') {
-            if is_valid_rule_header(lines.next().unwrap()) {
-                return ParseResult::Err(ParseStatus::Incomplete);
-            }
-            return ParseResult::Ok(build_steps, ParseStatus::Complete);
+impl From<(&str, &str)> for Target {
+    fn from(i: (&str, &str)) -> Self {
+        Self {
+            targets: i.0.split(' ').map(|target| target.to_string()).collect(),
+            dependencies: i
+                .1
+                .trim()
+                .split(' ')
+                .map(|target| target.to_string())
+                .collect(),
         }
-
-        build_steps.push(line.to_string())
     }
-
-    ParseResult::Ok(build_steps, ParseStatus::Complete)
 }
 
-pub fn parse_remake_file(remake_file_contents: &str) -> Rules {
-    parse_rules(remake_file_contents)
+fn parse_target_line(input: &str) -> Res<&str, Target> {
+    context(
+        "target_line",
+        separated_pair(take_until(":"), tag(":"), take_until("\n")),
+    )(input)
+    .map(|(next_input, res)| (next_input, res.into()))
+}
+
+fn parse_build_commands(input: &str) -> Res<&str, (Vec<&str>, &str)> {
+    context(
+        "parse_build_commands",
+        many_till(delimited(tag("\t"), take_until("\n"), tag("\n")), tag("\n")),
+    )(input)
+}
+
+fn parse_build_command(input: &str) -> Res<&str, &str> {
+    context(
+        "parse_build_command",
+        delimited(tag("\t"), take_until("\n"), tag("\n")),
+    )(input)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_parse_target_line() {
+        let target_line = "foo.c: foo.o\n";
+        let actual = parse_target_line(target_line);
+
+        assert_eq!(
+            Target {
+                targets: vec!["foo.c".to_string()],
+                dependencies: vec!["foo.o".to_string()]
+            },
+            actual.unwrap().1
+        );
+    }
+
+    #[test]
+    fn test_parse_build_commands() {
+        let build_commands = "\tgcc foo.c -o foo.o\n\techo it worked\n\n";
+        let actual = parse_build_commands(build_commands);
+        println!("actual {:?}", actual);
+
+        assert!(actual.is_ok())
+    }
+
+    #[test]
+    fn test_parse_build_command() {
+        let build_command = "\tgcc foo.c -o foo.o\n";
+        let actual = parse_build_command(build_command);
+
+        assert_eq!(actual.unwrap(), ("", "gcc foo.c -o foo.o"));
+    }
 }

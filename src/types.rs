@@ -3,7 +3,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub struct Rule {
     targets: Vec<Box<Path>>,
-    dependencies: Vec<Box<Path>>,
+    dependencies: Option<Vec<Box<Path>>>,
     build_steps: Vec<String>,
 }
 
@@ -17,19 +17,8 @@ impl Rule {
     ) -> Self {
         Self {
             targets,
-            dependencies,
             build_steps,
+            dependencies: Some(dependencies),
         }
     }
-}
-
-pub enum ParseStatus {
-    Complete,
-    Incomplete,
-    Error,
-}
-
-pub enum ParseResult<R, S> {
-    Ok(R, S),
-    Err(S),
 }
