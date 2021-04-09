@@ -37,12 +37,6 @@ struct VariableAssignment {
     value: String,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct ListAssignment {
-    symbol: String,
-    value: Vec<String>,
-}
-
 fn parse_variable_assignment(input: &str) -> Res<&str, VariableAssignment> {
     context(
         "parse_variable_assignment",
@@ -127,8 +121,7 @@ mod test {
     fn test_parse_variable_assignment() {
         let input = "foo = value";
         let actual = parse_variable_assignment(input);
-        println!("actual {:?}", actual);
 
-        assert!(actual.is_ok())
+        assert!(actual.is_ok());
     }
 }
