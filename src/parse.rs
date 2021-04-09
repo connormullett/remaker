@@ -31,6 +31,18 @@ impl From<(&str, &str)> for Target {
     }
 }
 
+#[derive(Debug, PartialEq, Eq)]
+struct VariableAssignment {
+    symbol: String,
+    value: String,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct ListAssignment {
+    symbol: String,
+    value: Vec<String>,
+}
+
 fn parse_target_line(input: &str) -> Res<&str, Target> {
     context(
         "target_line",
