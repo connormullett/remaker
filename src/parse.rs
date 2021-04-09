@@ -1,7 +1,10 @@
 use nom::{
-    bytes::{complete::tag, streaming::take_until},
+    bytes::{
+        complete::{tag, take_till},
+        streaming::take_until,
+    },
     error::{context, VerboseError},
-    multi::many_till,
+    multi::separated_list1,
     sequence::{delimited, separated_pair},
     IResult,
 };
@@ -36,11 +39,19 @@ fn parse_target_line(input: &str) -> Res<&str, Target> {
     .map(|(next_input, res)| (next_input, res.into()))
 }
 
-fn parse_build_commands(input: &str) -> Res<&str, (Vec<&str>, &str)> {
-    context(
+fn parse_build_commands(input: &str) -> Res<&str, Vec<&str>> {
+    let (next_input, output) = context(
         "parse_build_commands",
-        many_till(delimited(tag("\t"), take_until("\n"), tag("\n")), tag("\n")),
-    )(input)
+        separated_list1(tag("\n\t"), take_till(|c| c == '\n')),
+    )(input)?;
+
+    Ok((
+        next_input,
+        output
+            .into_iter()
+            .filter(|&item| !item.is_empty())
+            .collect(),
+    ))
 }
 
 fn parse_build_command(input: &str) -> Res<&str, &str> {
@@ -70,7 +81,7 @@ mod test {
 
     #[test]
     fn test_parse_build_commands() {
-        let build_commands = "\tgcc foo.c -o foo.o\n\techo it worked\n\n";
+        let build_commands = "\n\tgcc foo.c -o foo.o\n\techo it worked";
         let actual = parse_build_commands(build_commands);
         println!("actual {:?}", actual);
 
