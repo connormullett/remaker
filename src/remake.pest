@@ -1,19 +1,18 @@
+WHITESPACE = _{ " " | "\t" }
 
-WHITESPACE = _{ " " }
+alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" }
+digit = { '0'..'9' }
 
-char = { ASCII_ALPHANUMERIC | "_" | "." | "-" }
+ident = @{ (alpha | digit)+ }
+symbol = @{ (alpha | digit)+ }
+ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
-name = { char+ }
-value = { char+ }
+wildcard = { symbol ~ "=" ~ (ident | ident_list)+ }
 
-wildcard = { name ~ "=" ~ value+ }
+target_line = { symbol ~ ":" ~ (ident)+ ~ NEWLINE }
 
-target_header = { name+ ~ ":" ~ value+ }
+build_command = {ident_list ~ NEWLINE? }
 
-build_command = { "\t" ~ value }
+build_command_list = { (build_command)+ }
 
-remake_file = {
-  SOI ~
-  ((wildcard | target_header | build_command)? ~ NEWLINE)* ~
-  EOI
-}
+rule = { target_line ~ build_command_list+ }
