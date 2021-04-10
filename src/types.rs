@@ -1,4 +1,22 @@
 pub type Rules = Vec<Rule>;
+
+pub type Variables = Vec<VariableAssignment>;
+
+#[derive(Debug)]
+pub struct RemakeFile {
+    pub rules: Rules,
+    pub variables: Variables,
+}
+
+impl RemakeFile {
+    pub fn new() -> Self {
+        Self {
+            rules: vec![],
+            variables: vec![],
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct Target {
     pub targets: Vec<String>,

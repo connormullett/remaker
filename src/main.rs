@@ -21,11 +21,6 @@ fn find_remake_file() -> io::Result<PathBuf> {
     Ok(current_dir)
 }
 
-fn read_remake_file(path: PathBuf) -> io::Result<String> {
-    let buffer = fs::read_to_string(path)?;
-    Ok(buffer)
-}
-
 fn error_and_die(error: Box<dyn Error>) {
     println!("{}", error);
     process::exit(1);
@@ -39,11 +34,11 @@ fn main() {
         }
     };
 
-    let _remake_file_contents = match read_remake_file(remake_file_path) {
+    let remake_file_contents = match fs::read_to_string(remake_file_path) {
         Ok(content) => content,
         Err(error) => return error_and_die(Box::new(error)),
     };
 
-    // let rules = parse::parse_remake_file(&remake_file_contents);
-    // println!("{:?}", rules);
+    let rules = parse::parse_remake_file(&remake_file_contents);
+    println!("{:?}", rules);
 }

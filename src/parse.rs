@@ -6,11 +6,11 @@ use nom::{
     },
     error::{context, VerboseError},
     multi::separated_list1,
-    sequence::{delimited, separated_pair},
+    sequence::separated_pair,
     IResult,
 };
 
-use crate::types::{Rule, Rules, Target, VariableAssignment};
+use crate::types::{RemakeFile, Rule, Target, VariableAssignment};
 
 type Res<T, U> = IResult<T, U, VerboseError<T>>;
 
@@ -76,7 +76,14 @@ fn parse_rule(input: &str) -> Res<&str, Rule> {
     })
 }
 
-fn parse_remake_file(input: &str) {}
+pub fn parse_remake_file(input: &str) -> Res<&str, RemakeFile> {
+    let mut remake_file = RemakeFile::new();
+    permutation((parse_rule, parse_variable_assignment))(input).map(|(next_input, (rule, var))| {
+        remake_file.rules.push(rule);
+        remake_file.variables.push(var);
+        (next_input, remake_file)
+    })
+}
 
 #[cfg(test)]
 mod test {
