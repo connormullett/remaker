@@ -1,0 +1,19 @@
+
+WHITESPACE = _{ " " }
+
+char = { ASCII_ALPHANUMERIC | "_" | "." | "-" }
+
+name = { char+ }
+value = { char+ }
+
+wildcard = { name ~ "=" ~ value+ }
+
+target_header = { name+ ~ ":" ~ value+ }
+
+build_command = { "\t" ~ value }
+
+remake_file = {
+  SOI ~
+  ((wildcard | target_header | build_command)? ~ NEWLINE)* ~
+  EOI
+}

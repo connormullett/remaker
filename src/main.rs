@@ -2,8 +2,15 @@ use std::{error::Error, path::PathBuf};
 
 use std::{env, fs, io, process};
 
-mod parse;
-mod types;
+extern crate pest;
+#[macro_use]
+extern crate pest_derive;
+
+use pest::Parser;
+
+#[derive(Parser)]
+#[grammar = "remake.pest"]
+pub struct RemakeParser;
 
 const REMAKE_FILE_NAME: &str = "remaker";
 
@@ -39,6 +46,12 @@ fn main() {
         Err(error) => return error_and_die(Box::new(error)),
     };
 
-    let rules = parse::parse_remake_file(&remake_file_contents);
-    println!("{:?}", rules);
+    let file = RemakeParser::parse(Rule::remake_file, &&remake_file_contents)
+        .expect("bad parse")
+        .next()
+        .unwrap();
+
+    for line in file.into_inner() {
+        println!("{:#?}", line);
+    }
 }
