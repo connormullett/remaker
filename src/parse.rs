@@ -4,8 +4,9 @@ use nom::{
         complete::{tag, take_till},
         streaming::take_until,
     },
+    combinator::opt,
     error::{context, VerboseError},
-    multi::separated_list1,
+    multi::{many0, separated_list1},
     sequence::separated_pair,
     IResult,
 };
@@ -54,7 +55,11 @@ fn parse_build_commands(input: &str) -> Res<&str, Vec<&str>> {
 }
 
 fn parse_rule(input: &str) -> Res<&str, Rule> {
-    permutation((parse_target_line, parse_build_commands))(input).map(|(next_input, res)| {
+    context(
+        "parse_rule",
+        permutation((parse_target_line, parse_build_commands)),
+    )(input)
+    .map(|(next_input, res)| {
         (
             next_input,
             Rule {
@@ -76,13 +81,33 @@ fn parse_rule(input: &str) -> Res<&str, Rule> {
     })
 }
 
-pub fn parse_remake_file(input: &str) -> Res<&str, RemakeFile> {
-    let mut remake_file = RemakeFile::new();
-    permutation((parse_rule, parse_variable_assignment))(input).map(|(next_input, (rule, var))| {
-        remake_file.rules.push(rule);
-        remake_file.variables.push(var);
-        (next_input, remake_file)
-    })
+pub fn parse_remake_file(input: &str) -> RemakeFile {
+    let mut remake_file = RemakeFile {
+        rules: vec![],
+        variables: vec![],
+    };
+    let _ = context(
+        "parse_remake_file",
+        many0(permutation((
+            opt(parse_variable_assignment),
+            opt(parse_rule),
+        ))),
+    )(input)
+    .map(|(_, tuple_vec)| {
+        tuple_vec
+            .iter()
+            .map(|(variable, rule)| {
+                if let Some(value) = variable {
+                    remake_file.variables.push(value.clone());
+                }
+                if let Some(value) = rule {
+                    remake_file.rules.push(value.clone());
+                }
+            })
+            .collect::<()>()
+    });
+
+    remake_file
 }
 
 #[cfg(test)]
@@ -125,5 +150,13 @@ mod test {
         let actual = parse_rule(input);
 
         assert!(actual.is_ok());
+    }
+
+    #[test]
+    fn test_parse_remake_file() {
+        let input = include_str!("../remaker");
+        let actual = parse_remake_file(input);
+
+        println!("file {:?}", actual);
     }
 }

@@ -8,22 +8,13 @@ pub struct RemakeFile {
     pub variables: Variables,
 }
 
-impl RemakeFile {
-    pub fn new() -> Self {
-        Self {
-            rules: vec![],
-            variables: vec![],
-        }
-    }
-}
-
 #[derive(Debug, PartialEq, Eq)]
 pub struct Target {
     pub targets: Vec<String>,
     pub dependencies: Vec<String>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct VariableAssignment {
     pub symbol: String,
     pub value: String,
@@ -43,7 +34,7 @@ impl From<(&str, &str)> for Target {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Rule {
     pub targets: Vec<Box<String>>,
     pub dependencies: Vec<Box<String>>,
