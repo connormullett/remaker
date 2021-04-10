@@ -53,13 +53,6 @@ fn parse_build_commands(input: &str) -> Res<&str, Vec<&str>> {
     ))
 }
 
-fn parse_build_command(input: &str) -> Res<&str, &str> {
-    context(
-        "parse_build_command",
-        delimited(tag("\t"), take_until("\n"), tag("\n")),
-    )(input)
-}
-
 fn parse_rule(input: &str) -> Res<&str, Rule> {
     permutation((parse_target_line, parse_build_commands))(input).map(|(next_input, res)| {
         (
@@ -83,7 +76,6 @@ fn parse_rule(input: &str) -> Res<&str, Rule> {
     })
 }
 
-// TODO: maybe a full struct with rules and variables
 fn parse_remake_file(input: &str) {}
 
 #[cfg(test)]
@@ -113,17 +105,17 @@ mod test {
     }
 
     #[test]
-    fn test_parse_build_command() {
-        let build_command = "\tgcc foo.c -o foo.o\n";
-        let actual = parse_build_command(build_command);
-
-        assert_eq!(actual.unwrap(), ("", "gcc foo.c -o foo.o"));
-    }
-
-    #[test]
     fn test_parse_variable_assignment() {
         let input = "foo = value";
         let actual = parse_variable_assignment(input);
+
+        assert!(actual.is_ok());
+    }
+
+    #[test]
+    fn test_parse_rule() {
+        let input = "foo.c: foo.o\n\tgcc -o foo.c -c\n\techo it works";
+        let actual = parse_rule(input);
 
         assert!(actual.is_ok());
     }

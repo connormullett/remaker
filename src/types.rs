@@ -7,8 +7,8 @@ pub struct Target {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct VariableAssignment {
-    symbol: String,
-    value: String,
+    pub symbol: String,
+    pub value: String,
 }
 
 impl From<(&str, &str)> for Target {
