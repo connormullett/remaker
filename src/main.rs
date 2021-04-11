@@ -156,7 +156,9 @@ fn main() {
         }
     }
 
-    rules.push(current_rule);
+    if !current_rule.is_empty() {
+        rules.push(current_rule);
+    }
 
     let remake_file = RemakeFile {
         rules,
