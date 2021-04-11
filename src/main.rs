@@ -32,7 +32,7 @@ fn error_and_die(error: Box<dyn Error>) {
     process::exit(1);
 }
 
-fn get_modified_time_from_path(path: PathBuf) -> SystemTime {
+fn get_modified_time_from_path(path: &PathBuf) -> SystemTime {
     match fs::metadata(path) {
         Ok(value) => value.modified().unwrap(),
         Err(_) => SystemTime::UNIX_EPOCH,
@@ -40,11 +40,6 @@ fn get_modified_time_from_path(path: PathBuf) -> SystemTime {
 }
 
 fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
-    // use default rule as starting point
-    // compare timestamp of targets to timestamp of dependencies
-    // if the dependency is newer than target
-    // find the rule and repeat comparison
-    // otherwise; run the build commands
     let mut default_rule: Option<RemakeRule> = None;
     for rule in remake_file.rules.iter() {
         if rule.target == default_rule_name {
@@ -53,30 +48,26 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
     }
     let rule = default_rule.unwrap();
 
-    println!("default rule {:#?}", rule);
-    process_rule(rule, remake_file);
+    process_rule(&rule, &remake_file);
 }
 
-fn process_rule(rule: RemakeRule, remake_file: RemakeFile) {
-    let target_modified = get_modified_time_from_path(rule.target_as_path());
+fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
+    let target_modified = get_modified_time_from_path(&rule.target_as_path());
     let current_dir = env::current_dir().unwrap();
 
-    for dependency in rule.dependencies {
+    for dependency in &rule.dependencies {
         let mut dependency_path = current_dir.clone();
         dependency_path.push(PathBuf::from(&dependency));
-        let dependency_modified = get_modified_time_from_path(dependency_path);
+        let dependency_modified = get_modified_time_from_path(&dependency_path);
 
-        println!("dependency {:#?}", dependency);
-        // if dep is newer or they both equal zero
-        // recurse with dependency rule
-        // otherwise run build commands
-        if target_modified <= dependency_modified {
-            for rule in &remake_file.rules {
-                if rule.target.eq(&dependency) {
-                    println!("found rule {:#?}", rule);
+        if target_modified >= dependency_modified {
+            for dep_rule in &remake_file.rules {
+                if dep_rule.target.eq(dependency) {
+                    process_rule(&dep_rule, remake_file);
                 }
             }
         }
+        rule.run_build_commands();
     }
 }
 

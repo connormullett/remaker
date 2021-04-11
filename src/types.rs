@@ -22,17 +22,6 @@ impl RemakeRule {
         current_directory
     }
 
-    pub fn dependencies_as_path(&self) -> Vec<PathBuf> {
-        let mut new_deps: Vec<PathBuf> = Vec::new();
-        let current_directory = env::current_dir().unwrap();
-        for dep in self.dependencies.clone() {
-            let mut current = current_directory.clone();
-            current.push(dep.clone());
-            new_deps.push(current);
-        }
-        new_deps
-    }
-
     pub fn clear(&mut self) {
         self.target = String::new();
         self.dependencies = vec![];
@@ -61,6 +50,10 @@ impl RemakeRule {
         }
         self.build_commands = commands;
         self.clone()
+    }
+
+    pub fn run_build_commands(&self) {
+        println!("running build commands for {}", self.target);
     }
 }
 
