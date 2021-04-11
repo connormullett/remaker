@@ -1,6 +1,6 @@
 WHITESPACE = _{ " " | "\t" }
 
-alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" }
+alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" | "\"" }
 digit = { '0'..'9' }
 
 ident = @{ (alpha | digit)+ }
@@ -9,10 +9,12 @@ ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
 wildcard = { symbol ~ "=" ~ (ident | ident_list)+ }
 
-target_line = { symbol ~ ":" ~ (ident)+ ~ NEWLINE }
+target_line = { symbol ~ ":" ~ (ident)+ }
 
-build_command = {ident_list ~ NEWLINE? }
+build_command = @{ ident_list }
 
-build_command_list = { (build_command)+ }
-
-rule = { target_line ~ build_command_list+ }
+remake_file = {
+    SOI ~
+    ((wildcard | target_line | build_command)? ~ NEWLINE)* ~
+    EOI?
+}
