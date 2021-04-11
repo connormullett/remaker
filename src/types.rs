@@ -97,7 +97,6 @@ pub struct RemakeFile {
 impl RemakeFile {
     pub fn handle_wildcards(&mut self) {
         let mut new_rules = Vec::new();
-        println!("self.rules {:#?}", self.rules);
         for mut rule in self.rules.clone() {
             new_rules.push(rule.expand_wildcards(&self.wildcards));
         }
