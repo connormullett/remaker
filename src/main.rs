@@ -118,6 +118,7 @@ fn main() {
 
     let mut rules = Vec::<RemakeRule>::new();
     let mut current_rule = RemakeRule::new();
+    let mut first_rule = true;
 
     for line in file.into_inner() {
         match line.as_rule() {
@@ -134,10 +135,11 @@ fn main() {
                 current_wildcard.clear();
             }
             Rule::target_line => {
-                if !current_rule.is_empty() {
+                if !first_rule {
+                    // if it is not the first rule, push the rule
                     rules.push(current_rule.clone());
-                    current_rule.clear();
                 }
+                current_rule.clear();
                 let mut inner_rules = line.into_inner();
                 let target = inner_rules.next().unwrap().as_str();
                 let dependencies = inner_rules.next().unwrap().as_str();
@@ -146,12 +148,15 @@ fn main() {
                     dependencies: vec![dependencies],
                     build_commands: vec![],
                 };
+                first_rule = false;
             }
             Rule::build_command => current_rule.build_commands.push(line.as_str()),
             Rule::EOI => (),
             _ => (),
         }
     }
+
+    rules.push(current_rule);
 
     let remake_file = RemakeFile {
         rules,

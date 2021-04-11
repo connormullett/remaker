@@ -16,5 +16,5 @@ build_command = @{ ident_list }
 remake_file = {
     SOI ~
     ((wildcard | target_line | build_command)? ~ NEWLINE)* ~
-    EOI?
+    EOI
 }
