@@ -70,8 +70,9 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
                     process_rule(&dep_rule, remake_file);
                 }
             }
+        } else {
+            rule.run_build_commands();
         }
-        rule.run_build_commands();
     }
 }
 
