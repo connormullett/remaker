@@ -1,4 +1,4 @@
-use std::{error::Error, ops::Rem, path::PathBuf};
+use std::{error::Error, path::PathBuf};
 
 use std::{env, fs, io, process};
 
@@ -55,6 +55,7 @@ impl<'a> RemakeWildcard<'a> {
     }
 }
 
+#[derive(Debug)]
 struct RemakeFile<'a> {
     rules: Vec<RemakeRule<'a>>,
     wildcards: Vec<RemakeWildcard<'a>>,
@@ -139,5 +140,10 @@ fn main() {
         }
     }
 
-    println!("wildcards {:#?}", wildcards);
+    let remake_file = RemakeFile {
+        rules,
+        wildcards: wildcards.clone(),
+    };
+
+    println!("file {:#?}", remake_file);
 }
