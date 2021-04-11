@@ -1,4 +1,6 @@
 
-main: foo.c
-    gcc foo.c -o main
+main: foo.o
+    gcc foo.o -o main
 
+foo.o: foo.c
+    gcc -c foo.c -o foo.o

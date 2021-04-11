@@ -2,6 +2,8 @@ use std::{error::Error, path::PathBuf};
 
 use std::{env, fs, io, process};
 
+use types::RemakeRule;
+
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
@@ -49,16 +51,23 @@ fn main() {
 
     remake_file.handle_wildcards();
 
-    let default_rule = match args.next() {
+    let default_rule_name = match args.next() {
         Some(value) => value,
         None => remake_file.rules[0].target.to_string(),
     };
 
-    println!("{}", default_rule);
-    println!("file {:#?}", remake_file);
+    let mut default_rule: Option<RemakeRule> = None;
+    for rule in remake_file.rules.iter() {
+        if rule.target == default_rule_name {
+            default_rule = Some(rule.clone());
+        }
+    }
 
-    for rule in remake_file.rules.clone() {
-        println!("targets {:?}", rule.target_as_path());
-        println!("deps {:?}", rule.dependencies_as_path());
+    println!("default_rule {:?}", default_rule);
+
+    let target_metadata = fs::metadata(default_rule.unwrap().target_as_path());
+    match target_metadata {
+        Ok(value) => println!("modified {:?}", value.modified()),
+        Err(error) => error_and_die(Box::new(error)),
     }
 }
