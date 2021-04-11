@@ -32,3 +32,5 @@ Then, you can use remake from the command line by invoking `remake`.
 ## Currently Not Supported
 - Phony rules
 - conditionals
+- appending values to variables
+- wildcard and placeholders (i.e. ^$, $@, and % )
