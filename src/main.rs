@@ -45,7 +45,9 @@ fn main() {
         Err(error) => return error_and_die(Box::new(error)),
     };
 
-    let remake_file = parse::parse(&remake_file_contents);
+    let mut remake_file = parse::parse(&remake_file_contents);
+
+    remake_file.handle_wildcards();
 
     let default_rule = match args.next() {
         Some(value) => value,
@@ -54,16 +56,4 @@ fn main() {
 
     println!("{}", default_rule);
     println!("file {:#?}", remake_file);
-
-    let mut wildcards_map = HashMap::<String, String>::new();
-
-    for wildcard in remake_file.wildcards {
-        wildcards_map.insert(wildcard.symbol.to_string(), wildcard.values_as_string());
-    }
-
-    for rule in remake_file.rules {
-        for mut command in rule.build_commands {}
-    }
-
-    println!("{:#?}", wildcards_map);
 }

@@ -27,6 +27,22 @@ impl RemakeRule {
         }
         return false;
     }
+
+    pub fn expand_wildcards(&mut self, wildcards: &Vec<RemakeWildcard>) -> Self {
+        let mut commands = Vec::new();
+
+        for mut command in self.build_commands.clone().into_iter() {
+            for wildcard in wildcards {
+                command = command.replace(
+                    wildcard.symbol.as_str(),
+                    wildcard.values_as_string().as_str(),
+                );
+            }
+            commands.push(command.clone())
+        }
+        self.build_commands = commands;
+        self.clone()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -49,7 +65,7 @@ impl RemakeWildcard {
     }
 
     pub fn values_as_string(&self) -> String {
-        self.values.join(" ")
+        self.values.join(" ").to_string()
     }
 }
 
@@ -57,4 +73,15 @@ impl RemakeWildcard {
 pub struct RemakeFile {
     pub rules: Vec<RemakeRule>,
     pub wildcards: Vec<RemakeWildcard>,
+}
+
+impl RemakeFile {
+    pub fn handle_wildcards(&mut self) {
+        let mut new_rules = Vec::new();
+        println!("self.rules {:#?}", self.rules);
+        for mut rule in self.rules.clone() {
+            new_rules.push(rule.expand_wildcards(&self.wildcards));
+        }
+        self.rules = new_rules
+    }
 }
