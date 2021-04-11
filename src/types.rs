@@ -44,10 +44,10 @@ impl RemakeRule {
         {
             return true;
         }
-        return false;
+        false
     }
 
-    pub fn expand_wildcards(&mut self, wildcards: &Vec<RemakeWildcard>) -> Self {
+    pub fn expand_wildcards(&mut self, wildcards: &[RemakeWildcard]) -> Self {
         let mut commands = Vec::new();
 
         for mut command in self.build_commands.clone().into_iter() {
@@ -84,7 +84,7 @@ impl RemakeWildcard {
     }
 
     pub fn values_as_string(&self) -> String {
-        self.values.join(" ").to_string()
+        self.values.join(" ")
     }
 }
 

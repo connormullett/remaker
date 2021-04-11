@@ -52,7 +52,7 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
 fn get_modified_time_from_path(path: PathBuf) -> SystemTime {
     match fs::metadata(path) {
         Ok(value) => value.modified().unwrap(),
-        Err(_) => SystemTime::from(SystemTime::UNIX_EPOCH),
+        Err(_) => SystemTime::UNIX_EPOCH,
     }
 }
 

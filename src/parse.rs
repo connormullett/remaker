@@ -1,8 +1,11 @@
+#![allow(clippy::clippy::upper_case_acronyms)]
+
+use crate::types::{RemakeFile, RemakeRule, RemakeWildcard};
 use pest::Parser;
+
 #[derive(Parser)]
 #[grammar = "remake.pest"]
 struct RemakeParser;
-use crate::types::{RemakeFile, RemakeRule, RemakeWildcard};
 
 pub fn parse(remake_file_contents: &str) -> RemakeFile {
     let file = RemakeParser::parse(Rule::remake_file, &&remake_file_contents)
@@ -24,9 +27,10 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 let mut current_wildcard = RemakeWildcard::new();
                 current_wildcard.symbol = String::from(symbol);
 
-                while let Some(value) = inner_rules.next() {
+                for value in inner_rules {
                     current_wildcard.values.push(String::from(value.as_str()));
                 }
+
                 wildcards.push(current_wildcard.clone());
                 current_wildcard.clear();
             }
@@ -55,8 +59,5 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
         rules.push(current_rule);
     }
 
-    RemakeFile {
-        rules,
-        wildcards: wildcards.clone(),
-    }
+    RemakeFile { rules, wildcards }
 }
