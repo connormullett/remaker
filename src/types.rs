@@ -1,3 +1,5 @@
+use std::{env, path::PathBuf};
+
 #[derive(Debug, Clone)]
 pub struct RemakeRule {
     pub target: String,
@@ -12,6 +14,23 @@ impl RemakeRule {
             dependencies: vec![],
             build_commands: vec![],
         }
+    }
+
+    pub fn target_as_path(&self) -> PathBuf {
+        let mut current_directory = env::current_dir().unwrap();
+        current_directory.push(self.target.clone());
+        current_directory
+    }
+
+    pub fn dependencies_as_path(&self) -> Vec<PathBuf> {
+        let mut new_deps: Vec<PathBuf> = Vec::new();
+        let current_directory = env::current_dir().unwrap();
+        for dep in self.dependencies.clone() {
+            let mut current = current_directory.clone();
+            current.push(dep.clone());
+            new_deps.push(current);
+        }
+        new_deps
     }
 
     pub fn clear(&mut self) {

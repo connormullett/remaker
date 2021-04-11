@@ -56,4 +56,9 @@ fn main() {
 
     println!("{}", default_rule);
     println!("file {:#?}", remake_file);
+
+    for rule in remake_file.rules.clone() {
+        println!("targets {:?}", rule.target_as_path());
+        println!("deps {:?}", rule.dependencies_as_path());
+    }
 }
