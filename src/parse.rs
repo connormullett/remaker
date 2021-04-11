@@ -40,7 +40,7 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 let target = inner_rules.next().unwrap().as_str();
                 let dependencies = inner_rules.next().unwrap().as_str();
                 current_rule = RemakeRule {
-                    targets: vec![target],
+                    target,
                     dependencies: vec![dependencies],
                     build_commands: vec![],
                 };

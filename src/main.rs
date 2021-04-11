@@ -31,6 +31,8 @@ fn error_and_die(error: Box<dyn Error>) {
 }
 
 fn main() {
+    let mut args = env::args().skip(1);
+
     let remake_file_path = match find_remake_file() {
         Ok(file) => file,
         Err(error) => {
@@ -45,5 +47,14 @@ fn main() {
 
     let remake_file = parse::parse(&remake_file_contents);
 
-    println!("file {:#?}", remake_file);
+    let default_rule = match args.next() {
+        Some(value) => value,
+        None => remake_file.rules[0].target.to_string(),
+    };
+
+    println!("default {}", default_rule);
+
+    // for every rule
+    // replace values with wildcards
+    // run a specified rule or default (first rule)
 }
