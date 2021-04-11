@@ -33,6 +33,20 @@ impl<'a> RemakeRule<'a> {
         self.dependencies = vec![];
         self.build_commands = vec![];
     }
+
+    pub fn is_empty(&self) -> bool {
+        if let false = self.targets.is_empty() {
+            return false;
+        }
+        if let false = self.dependencies.is_empty() {
+            return false;
+        }
+        if let false = self.build_commands.is_empty() {
+            return false;
+        }
+
+        true
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -120,8 +134,10 @@ fn main() {
                 current_wildcard.clear();
             }
             Rule::target_line => {
-                rules.push(current_rule.clone());
-                current_rule.clear();
+                if !current_rule.is_empty() {
+                    rules.push(current_rule.clone());
+                    current_rule.clear();
+                }
                 let mut inner_rules = line.into_inner();
                 let target = inner_rules.next().unwrap().as_str();
                 let dependencies = inner_rules.next().unwrap().as_str();
@@ -131,10 +147,7 @@ fn main() {
                     build_commands: vec![],
                 };
             }
-            Rule::build_command => {
-                let rules = line.into_inner();
-                current_rule.build_commands.push(rules.as_str())
-            }
+            Rule::build_command => current_rule.build_commands.push(line.as_str()),
             Rule::EOI => (),
             _ => (),
         }
