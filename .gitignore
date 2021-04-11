@@ -1,4 +1,5 @@
 /target
 examples/main
+examples/*.o
 remaker
 .vscode

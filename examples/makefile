@@ -1,4 +1,0 @@
-
-main: foo.c
-	gcc foo.c -o main
-

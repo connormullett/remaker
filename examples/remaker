@@ -1,6 +1,9 @@
 
+CC=gcc
+
 main: foo.o
-    gcc foo.o -o main
+    CC foo.o -o main
+    echo "it worked"
 
 foo.o: foo.c
-    gcc -c foo.c -o foo.o
+    CC -c foo.c -o foo.o

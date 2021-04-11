@@ -1,4 +1,9 @@
-use std::{env, path::PathBuf};
+use std::{env, ffi::CString, path::PathBuf};
+
+use nix::{
+    sys::wait::{waitpid, WaitStatus},
+    unistd::{execvp, fork, ForkResult},
+};
 
 #[derive(Debug, Clone)]
 pub struct RemakeRule {
@@ -53,7 +58,31 @@ impl RemakeRule {
     }
 
     pub fn run_build_commands(&self) {
-        println!("running build commands for {}", self.target);
+        for command in self.build_commands.clone() {
+            println!("{}", command);
+            let fork_result = unsafe { fork() };
+
+            if let Ok(ForkResult::Child) = fork_result {
+                let args: Vec<CString> = command
+                    .split(" ")
+                    .map(|item| CString::new(item.as_bytes()).unwrap())
+                    .collect();
+                if let Err(e) = execvp(&args[0], &args) {
+                    println!("error during command '{}': {}", command, e);
+                    panic!();
+                }
+            }
+
+            if let Ok(ForkResult::Parent { child, .. }) = fork_result {
+                loop {
+                    match waitpid(child, None) {
+                        Ok(WaitStatus::Exited(_, _)) => break,
+                        Ok(WaitStatus::Signaled(_, _, _)) => break,
+                        _ => {}
+                    };
+                }
+            };
+        }
     }
 }
 
