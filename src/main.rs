@@ -44,13 +44,26 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
             default_rule = Some(rule.clone());
         }
     }
+    let rule = default_rule.unwrap();
+
+    process_rule(rule, remake_file);
 }
 
-fn process_rule(rule: RemakeRule) {
-    let target_modified = match fs::metadata(rule.target_as_path()) {
+fn get_modified_time_from_path(path: PathBuf) -> SystemTime {
+    match fs::metadata(path) {
         Ok(value) => value.modified().unwrap(),
         Err(_) => SystemTime::from(SystemTime::UNIX_EPOCH),
-    };
+    }
+}
+
+fn process_rule(rule: RemakeRule, remake_file: RemakeFile) {
+    let target_modified = get_modified_time_from_path(rule.target_as_path());
+
+    for dependency in rule.dependencies_as_path() {
+        let dependency_modified = get_modified_time_from_path(dependency);
+
+        if target_modified < dependency_modified {}
+    }
 }
 
 fn main() {
