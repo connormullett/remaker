@@ -1,4 +1,4 @@
-use std::{error::Error, path::PathBuf};
+use std::{error::Error, path::PathBuf, time::SystemTime};
 
 use std::{env, fs, io, process};
 
@@ -63,9 +63,10 @@ fn main() {
         }
     }
 
-    let target_metadata = fs::metadata(default_rule.unwrap().target_as_path());
-    match target_metadata {
-        Ok(value) => println!("modified {:?}", value.modified()),
-        Err(error) => error_and_die(Box::new(error)),
-    }
+    let target_modified = match fs::metadata(default_rule.unwrap().target_as_path()) {
+        Ok(value) => value.modified().unwrap(),
+        Err(_) => SystemTime::from(SystemTime::UNIX_EPOCH),
+    };
+
+    println!("modified {:?}", target_modified);
 }
