@@ -63,8 +63,6 @@ fn main() {
         }
     }
 
-    println!("default_rule {:?}", default_rule);
-
     let target_metadata = fs::metadata(default_rule.unwrap().target_as_path());
     match target_metadata {
         Ok(value) => println!("modified {:?}", value.modified()),
