@@ -1,4 +1,4 @@
-use std::{error::Error, path::PathBuf};
+use std::{collections::HashMap, error::Error, path::PathBuf};
 
 use std::{env, fs, io, process};
 
@@ -52,9 +52,18 @@ fn main() {
         None => remake_file.rules[0].target.to_string(),
     };
 
-    println!("default {}", default_rule);
+    println!("{}", default_rule);
+    println!("file {:#?}", remake_file);
 
-    // for every rule
-    // replace values with wildcards
-    // run a specified rule or default (first rule)
+    let mut wildcards_map = HashMap::<String, String>::new();
+
+    for wildcard in remake_file.wildcards {
+        wildcards_map.insert(wildcard.symbol.to_string(), wildcard.values_as_string());
+    }
+
+    for rule in remake_file.rules {
+        for mut command in rule.build_commands {}
+    }
+
+    println!("{:#?}", wildcards_map);
 }

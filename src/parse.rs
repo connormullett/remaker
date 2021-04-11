@@ -22,17 +22,16 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 let mut inner_rules = line.into_inner();
                 let symbol: &str = inner_rules.next().unwrap().as_str();
                 let mut current_wildcard = RemakeWildcard::new();
-                current_wildcard.symbol = symbol;
+                current_wildcard.symbol = String::from(symbol);
 
                 while let Some(value) = inner_rules.next() {
-                    current_wildcard.values.push(value.as_str());
+                    current_wildcard.values.push(String::from(value.as_str()));
                 }
                 wildcards.push(current_wildcard.clone());
                 current_wildcard.clear();
             }
             Rule::target_line => {
                 if !first_rule {
-                    // if it is not the first rule, push the rule
                     rules.push(current_rule.clone());
                 }
                 current_rule.clear();
@@ -40,13 +39,13 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 let target = inner_rules.next().unwrap().as_str();
                 let dependencies = inner_rules.next().unwrap().as_str();
                 current_rule = RemakeRule {
-                    target,
-                    dependencies: vec![dependencies],
+                    target: String::from(target),
+                    dependencies: vec![String::from(dependencies)],
                     build_commands: vec![],
                 };
                 first_rule = false;
             }
-            Rule::build_command => current_rule.build_commands.push(line.as_str()),
+            Rule::build_command => current_rule.build_commands.push(line.as_str().to_string()),
             Rule::EOI => (),
             _ => (),
         }

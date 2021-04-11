@@ -1,62 +1,60 @@
 #[derive(Debug, Clone)]
-pub struct RemakeRule<'a> {
-    pub target: &'a str,
-    pub dependencies: Vec<&'a str>,
-    pub build_commands: Vec<&'a str>,
+pub struct RemakeRule {
+    pub target: String,
+    pub dependencies: Vec<String>,
+    pub build_commands: Vec<String>,
 }
 
-impl<'a> RemakeRule<'a> {
+impl RemakeRule {
     pub fn new() -> Self {
         Self {
-            target: "",
+            target: String::new(),
             dependencies: vec![],
             build_commands: vec![],
         }
     }
 
     pub fn clear(&mut self) {
-        self.target = "";
+        self.target = String::new();
         self.dependencies = vec![];
         self.build_commands = vec![];
     }
 
     pub fn is_empty(&self) -> bool {
-        if let false = self.target.is_empty() {
-            return false;
+        if self.target.is_empty() && self.dependencies.is_empty() && self.build_commands.is_empty()
+        {
+            return true;
         }
-        if let false = self.dependencies.is_empty() {
-            return false;
-        }
-        if let false = self.build_commands.is_empty() {
-            return false;
-        }
-
-        true
+        return false;
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct RemakeWildcard<'a> {
-    pub symbol: &'a str,
-    pub values: Vec<&'a str>,
+pub struct RemakeWildcard {
+    pub symbol: String,
+    pub values: Vec<String>,
 }
 
-impl<'a> RemakeWildcard<'a> {
+impl RemakeWildcard {
     pub fn new() -> Self {
         Self {
-            symbol: "",
+            symbol: String::new(),
             values: vec![],
         }
     }
 
     pub fn clear(&mut self) {
-        self.symbol = "";
+        self.symbol = String::new();
         self.values = vec![];
+    }
+
+    pub fn values_as_string(&self) -> String {
+        self.values.join(" ")
     }
 }
 
 #[derive(Debug)]
-pub struct RemakeFile<'a> {
-    pub rules: Vec<RemakeRule<'a>>,
-    pub wildcards: Vec<RemakeWildcard<'a>>,
+pub struct RemakeFile {
+    pub rules: Vec<RemakeRule>,
+    pub wildcards: Vec<RemakeWildcard>,
 }

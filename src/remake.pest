@@ -4,12 +4,11 @@ alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" | "\"" }
 digit = { '0'..'9' }
 
 ident = @{ (alpha | digit)+ }
-symbol = @{ (alpha | digit)+ }
 ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
-wildcard = { symbol ~ "=" ~ (ident | ident_list)+ }
+wildcard = { ident ~ "=" ~ (ident | ident_list)+ }
 
-target_line = { symbol ~ ":" ~ (ident)+ }
+target_line = { ident ~ ":" ~ (ident)+ }
 
 build_command = @{ ident_list }
 
