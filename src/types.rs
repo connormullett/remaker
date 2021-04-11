@@ -64,7 +64,7 @@ impl RemakeRule {
 
             if let Ok(ForkResult::Child) = fork_result {
                 let args: Vec<CString> = command
-                    .split(" ")
+                    .split(' ')
                     .map(|item| CString::new(item.as_bytes()).unwrap())
                     .collect();
                 if let Err(e) = execvp(&args[0], &args) {

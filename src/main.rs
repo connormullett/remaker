@@ -1,4 +1,8 @@
-use std::{error::Error, path::PathBuf, time::SystemTime};
+use std::{
+    error::Error,
+    path::{Path, PathBuf},
+    time::SystemTime,
+};
 
 use std::{env, fs, io, process};
 
@@ -32,7 +36,7 @@ fn error_and_die(error: Box<dyn Error>) {
     process::exit(1);
 }
 
-fn get_modified_time_from_path(path: &PathBuf) -> SystemTime {
+fn get_modified_time_from_path(path: &Path) -> SystemTime {
     match fs::metadata(path) {
         Ok(value) => value.modified().unwrap(),
         Err(_) => SystemTime::UNIX_EPOCH,
