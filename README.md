@@ -13,6 +13,8 @@ Currently, targets and dependencies do not expand with placeholders or wildcards
 
 Using `*` for file matching is not supported as of now. For example, using `*.c` to refer to all C source files will not expand as expected, and will instead look for a file named `*.c`.
 
+To specify a remake file in a separate directory or by another name, use `--path ./path/to/remaker`. This option uses relative pathing.
+
 An example remake file looks like the following:
 
 ```
