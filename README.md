@@ -9,6 +9,10 @@ A remake file needs to be named `remaker`.
 
 Remake uses the first rule found in the remake file as the default rule. To specify a rule to use (such as test), use `remake test`.
 
+Currently, targets and dependencies do not expand with placeholders or wildcards. Only recipes check for these values.
+
+Using `*` for file matching is not supported as of now. For example, using `*.c` to refer to all C source files will not expand as expected, and will instead look for a file named `*.c`.
+
 An example remake file looks like the following:
 
 ```
