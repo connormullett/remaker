@@ -8,5 +8,8 @@ main: foo.o
 foo.o: foo.c
     CC -c foo.c -o foo.o
 
+test:
+    cargo test
+
 clean:
     rm CLEAN_FILES
