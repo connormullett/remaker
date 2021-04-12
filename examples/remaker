@@ -3,7 +3,6 @@ CC=gcc
 
 main: foo.o
     CC foo.o -o main
-    echo "it worked"
 
 foo.o: foo.c
     CC -c foo.c -o foo.o
