@@ -13,6 +13,8 @@ An example remake file looks like the following:
 
 ```
 CC=gcc
+BIN=main
+OBJECT=foo.o
 
 main: foo.o
     CC foo.o -o main
@@ -20,6 +22,9 @@ main: foo.o
 
 foo.o: foo.c
     CC -c foo.c -o foo.o
+
+clean:
+    rm BIN OBJECT
 ```
 
 ## Installation
