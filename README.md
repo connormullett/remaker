@@ -23,9 +23,9 @@ foo.o: foo.c
 ```
 
 ## Installation
-> git clone https://github.com/connormullett/remaker.git
-> cd remaker
-> cargo install --path .
+- `git clone https://github.com/connormullett/remaker.git`
+- `cd remaker`
+- `cargo install --path .`
 
 Then, you can use remake from the command line by invoking `remake`.
 
