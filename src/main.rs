@@ -35,8 +35,13 @@ fn find_remake_file(file_name: Option<&str>) -> io::Result<PathBuf> {
     Ok(current_dir)
 }
 
-fn error_and_die(error: Box<dyn Error>) {
+fn error_and_die_with_error(error: Box<dyn Error>) {
     println!("{}", error);
+    process::exit(1);
+}
+
+fn error_and_die(error_msg: String) {
+    eprintln!("{}", error_msg);
     process::exit(1);
 }
 
@@ -54,7 +59,11 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
             default_rule = Some(rule.clone());
         }
     }
-    let rule = default_rule.unwrap();
+
+    let rule = match default_rule {
+        Some(value) => value,
+        None => return error_and_die(format!("No rule by name '{}'", default_rule_name)),
+    };
 
     process_rule(&rule, &remake_file);
 }
@@ -115,13 +124,13 @@ fn main() {
     let remake_file_path = match find_remake_file(defined_remake_file) {
         Ok(file) => file,
         Err(error) => {
-            return error_and_die(Box::new(error));
+            return error_and_die_with_error(Box::new(error));
         }
     };
 
     let remake_file_contents = match fs::read_to_string(remake_file_path) {
         Ok(content) => content,
-        Err(error) => return error_and_die(Box::new(error)),
+        Err(error) => return error_and_die_with_error(Box::new(error)),
     };
 
     let mut remake_file = parse::parse(&remake_file_contents);
