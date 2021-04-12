@@ -1,4 +1,4 @@
-use std::{env, ffi::CString, path::PathBuf};
+use std::ffi::CString;
 
 use nix::{
     sys::wait::{waitpid, WaitStatus},
@@ -19,12 +19,6 @@ impl RemakeRule {
             dependencies: vec![],
             build_commands: vec![],
         }
-    }
-
-    pub fn target_as_path(&self) -> PathBuf {
-        let mut current_directory = env::current_dir().unwrap();
-        current_directory.push(self.target.clone());
-        current_directory
     }
 
     pub fn clear(&mut self) {
@@ -67,10 +61,7 @@ impl RemakeRule {
                     .split(' ')
                     .map(|item| CString::new(item.as_bytes()).unwrap())
                     .collect();
-                if let Err(e) = execvp(&args[0], &args) {
-                    println!("error during command '{}': {}", command, e);
-                    panic!();
-                }
+                let _ = execvp(&args[0], &args);
             }
 
             if let Ok(ForkResult::Parent { child, .. }) = fork_result {
