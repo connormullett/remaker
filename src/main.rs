@@ -69,6 +69,10 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
     let target_path = create_full_path_from_string(rule.target.clone());
     let target_modified = get_modified_time_from_path(&target_path);
 
+    if rule.dependencies.is_empty() {
+        return rule.run_build_commands();
+    }
+
     for dependency in &rule.dependencies {
         let dependency_path = create_full_path_from_string(dependency.clone());
         let dependency_modified = get_modified_time_from_path(&dependency_path);

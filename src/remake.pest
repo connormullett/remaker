@@ -1,6 +1,6 @@
 WHITESPACE = _{ " " | "\t" }
 
-alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" | "\"" | "/" }
+alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" | "\"" | "/" | "*" }
 digit = { '0'..'9' }
 
 ident = @{ (alpha | digit)+ }
@@ -8,7 +8,7 @@ ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
 wildcard = { ident ~ "=" ~ (ident | ident_list)+ }
 
-target_line = { ident ~ ":" ~ (ident)+ }
+target_line = { ident ~ ":" ~ ident* }
 
 build_command = @{ ident_list }
 

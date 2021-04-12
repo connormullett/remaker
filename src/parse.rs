@@ -41,10 +41,18 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 current_rule.clear();
                 let mut inner_rules = line.into_inner();
                 let target = inner_rules.next().unwrap().as_str();
-                let dependencies = inner_rules.next().unwrap().as_str();
+                let dependencies = match inner_rules.next() {
+                    Some(value) => value
+                        .as_str()
+                        .split(' ')
+                        .into_iter()
+                        .map(|value| value.to_string())
+                        .collect(),
+                    None => vec![],
+                };
                 current_rule = RemakeRule {
                     target: String::from(target),
-                    dependencies: vec![String::from(dependencies)],
+                    dependencies,
                     build_commands: vec![],
                 };
                 first_rule = false;
