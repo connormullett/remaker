@@ -137,6 +137,7 @@ fn main() {
 
     let mut remake_file = parse::parse(&remake_file_contents);
 
+    // TODO: expand placeholders in targets and dependencies
     remake_file.handle_wildcards();
 
     let default_rule = match matches.value_of("RULE") {
