@@ -1,5 +1,6 @@
 
 CC=gcc
+CLEAN_FILES=foo.o main
 
 main: foo.o
     CC foo.o -o main
@@ -8,4 +9,4 @@ foo.o: foo.c
     CC -c foo.c -o foo.o
 
 clean:
-    rm foo.o main
+    rm CLEAN_FILES
