@@ -1,5 +1,4 @@
 use std::{
-    error::Error,
     path::{Path, PathBuf},
     time::SystemTime,
 };
@@ -33,11 +32,6 @@ fn find_remake_file(file_name: Option<&str>) -> io::Result<PathBuf> {
     }
 
     Ok(current_dir)
-}
-
-fn error_and_die_with_error(error: Box<dyn Error>) {
-    println!("{}", error);
-    process::exit(1);
 }
 
 fn error_and_die(error_msg: String) {
@@ -123,14 +117,22 @@ fn main() {
 
     let remake_file_path = match find_remake_file(defined_remake_file) {
         Ok(file) => file,
-        Err(error) => {
-            return error_and_die_with_error(Box::new(error));
+        Err(_) => {
+            return error_and_die(format!(
+                "Can't find remake file '{}'",
+                defined_remake_file.unwrap_or(REMAKE_FILE_NAME)
+            ));
         }
     };
 
-    let remake_file_contents = match fs::read_to_string(remake_file_path) {
+    let remake_file_contents = match fs::read_to_string(&remake_file_path) {
         Ok(content) => content,
-        Err(error) => return error_and_die_with_error(Box::new(error)),
+        Err(_) => {
+            return error_and_die(format!(
+                "error reading file '{}'",
+                remake_file_path.to_string_lossy()
+            ))
+        }
     };
 
     let mut remake_file = parse::parse(&remake_file_contents);

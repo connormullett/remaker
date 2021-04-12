@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-    int x = 6;
-    printf("%d\n", x);
+    char* x = "foo";
+    printf("%s\n", x);
 }
 
