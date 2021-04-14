@@ -144,5 +144,7 @@ fn main() {
         None => remake_file.rules[0].target.to_string(),
     };
 
+    println!("file {:#?}", remake_file);
+
     process_rules(default_rule, remake_file);
 }

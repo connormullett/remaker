@@ -8,7 +8,7 @@ ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
 wildcard = { ident ~ "=" ~ (ident | ident_list)+ }
 
-target_line = { ident ~ ":" ~ ident* }
+target_line = { ident ~ ":" ~ (ident|ident_list)* }
 
 build_command = @{ ident_list }
 

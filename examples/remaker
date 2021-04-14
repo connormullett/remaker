@@ -1,15 +1,21 @@
 
 CC=gcc
+CFLAGS=-g
 CLEAN_FILES=foo.o main
+OBJS=foo.o math.o
+BIN=main
 
-main: foo.o
-    CC $^ -o $@
+main: math.o foo.o
+    CC CFLAGS $^ -o $@
 
 foo.o: foo.c
-    CC -c $^ -o $@
+    CC CFLAGS -c $^ -o $@
+
+math.o: math.c
+    CC CFLAGS -c $^ -o $@
 
 test:
     cargo $@
 
 clean:
-    rm CLEAN_FILES
+    rm OBJS BIN
