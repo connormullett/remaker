@@ -2,6 +2,9 @@
 CC=gcc
 CLEAN_FILES=foo.o main
 
+placeholder: foo.o
+    CC $^ -o $@
+
 main: foo.o
     CC foo.o -o main
 

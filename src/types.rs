@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::ffi::CString;
 
 use nix::{
@@ -44,6 +45,8 @@ impl RemakeRule {
                     wildcard.symbol.as_str(),
                     wildcard.values_as_string().as_str(),
                 );
+                command = command.replace("$@", self.target.as_str());
+                command = command.replace("$^", &self.dependencies_as_string())
             }
             commands.push(command.clone())
         }
@@ -74,6 +77,14 @@ impl RemakeRule {
                 }
             };
         }
+    }
+
+    fn dependencies_as_string(&self) -> String {
+        let mut output = String::new();
+        for dependency in &self.dependencies {
+            output.push_str(&dependency);
+        }
+        output
     }
 }
 
