@@ -2,17 +2,14 @@
 CC=gcc
 CLEAN_FILES=foo.o main
 
-placeholder: foo.o
+main: foo.o
     CC $^ -o $@
 
-main: foo.o
-    CC foo.o -o main
-
 foo.o: foo.c
-    CC -c foo.c -o foo.o
+    CC -c $^ -o $@
 
 test:
-    cargo test
+    cargo $@
 
 clean:
     rm CLEAN_FILES
