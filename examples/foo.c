@@ -8,5 +8,5 @@ int main() {
 
     int x, y = 5;
     int z = add(x, y);
-    printf("%d%d%d\n", x, y, z);
+    printf("%d\n", z);
 }

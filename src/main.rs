@@ -46,6 +46,12 @@ fn get_modified_time_from_path(path: &Path) -> SystemTime {
     }
 }
 
+fn create_full_path_from_string(name: String) -> PathBuf {
+    let mut out = env::current_dir().unwrap();
+    out.push(PathBuf::from(name));
+    out
+}
+
 fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
     let mut default_rule: Option<RemakeRule> = None;
     for rule in remake_file.rules.iter() {
@@ -60,12 +66,6 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
     };
 
     process_rule(&rule, &remake_file);
-}
-
-fn create_full_path_from_string(name: String) -> PathBuf {
-    let mut out = env::current_dir().unwrap();
-    out.push(PathBuf::from(name));
-    out
 }
 
 fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
@@ -84,7 +84,7 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
             for dep_rule in &remake_file.rules {
                 if dep_rule.target.eq(dependency) {
                     process_rule(&dep_rule, remake_file);
-                    rule.run_build_commands();
+                    rule.run_build_commands()
                 }
             }
         } else {
@@ -143,8 +143,6 @@ fn main() {
         Some(value) => value.to_string(),
         None => remake_file.rules[0].target.to_string(),
     };
-
-    println!("file {:#?}", remake_file);
 
     process_rules(default_rule, remake_file);
 }

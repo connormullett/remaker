@@ -79,11 +79,7 @@ impl RemakeRule {
     }
 
     fn dependencies_as_string(&self) -> String {
-        let mut output = String::new();
-        for dependency in &self.dependencies {
-            output.push_str(&dependency);
-        }
-        output
+        self.dependencies.join(" ")
     }
 }
 
