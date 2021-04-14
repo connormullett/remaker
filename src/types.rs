@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::ffi::CString;
 
 use nix::{
