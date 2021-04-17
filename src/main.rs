@@ -57,6 +57,7 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
     for rule in remake_file.rules.iter() {
         if rule.target == default_rule_name {
             default_rule = Some(rule.clone());
+            break;
         }
     }
 
@@ -84,7 +85,7 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
             for dep_rule in &remake_file.rules {
                 if dep_rule.target.eq(dependency) {
                     process_rule(&dep_rule, remake_file);
-                    rule.run_build_commands()
+                    rule.run_build_commands();
                 }
             }
         } else {
