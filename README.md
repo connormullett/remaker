@@ -44,7 +44,7 @@ Then, you can use remake from the command line by invoking `remake`.
 - Phony rules
 - conditionals
 - appending values to variables
-- wildcard and placeholders (i.e. ^$, $@, and % )
+- Targets/deps that are variadic (%.c meaning every 'c' source file)
 
 ## Want to help or see that I'm missing something above?
 Send it my way in issues, or open a PR. Everyone is welcome to contribute.
