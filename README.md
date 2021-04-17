@@ -19,18 +19,25 @@ An example remake file looks like the following:
 
 ```
 CC=gcc
+CFLAGS=-g
+CLEAN_FILES=foo.o main
+OBJS=foo.o math.o
 BIN=main
-OBJECT=foo.o
 
-main: foo.o
-    CC foo.o -o main
-    echo "it worked"
+BIN: OBJS
+    CC CFLAGS $^ -o $@
 
 foo.o: foo.c
-    CC -c foo.c -o foo.o
+    CC CFLAGS -c $^ -o $@
+
+math.o: math.c
+    CC CFLAGS -c $^ -o $@
+
+test:
+    cargo $@
 
 clean:
-    rm BIN OBJECT
+    rm OBJS BIN
 ```
 
 ## Installation
