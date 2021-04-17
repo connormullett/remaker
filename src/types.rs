@@ -38,7 +38,7 @@ impl RemakeRule {
     pub fn expand_wildcards(&mut self, wildcards: &[RemakeWildcard]) -> Self {
         let mut commands = Vec::new();
 
-        for mut command in self.build_commands.clone().into_iter() {
+        for mut command in self.build_commands.clone() {
             for wildcard in wildcards {
                 command = command.replace(
                     wildcard.symbol.as_str(),
@@ -57,6 +57,20 @@ impl RemakeRule {
             commands.push(command.clone())
         }
 
+        let mut dependencies = Vec::new();
+        for mut dependency in self.dependencies.clone() {
+            for wildcard in wildcards {
+                dependency = dependency.replace(
+                    wildcard.symbol.as_str(),
+                    wildcard.values_as_string().as_str(),
+                );
+            }
+            for split_dep in dependency.split(' ') {
+                dependencies.push(split_dep.to_string());
+            }
+        }
+
+        self.dependencies = dependencies;
         self.build_commands = commands;
         self.clone()
     }

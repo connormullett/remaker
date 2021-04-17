@@ -87,7 +87,9 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
                     process_rule(&dep_rule, remake_file);
                 }
             }
-            error_and_die(format!("'{}' has no defined rule. exiting", dependency));
+            if !Path::new(dependency).exists() {
+                error_and_die(format!("'{}' has no defined rule. exiting", dependency));
+            }
         } else {
             rule.run_build_commands();
         }
