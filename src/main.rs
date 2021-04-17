@@ -66,16 +66,17 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
         None => return error_and_die(format!("No rule by name '{}'", default_rule_name)),
     };
 
-    process_rule(&rule, &remake_file);
+    if rule.dependencies.is_empty() {
+        rule.run_build_commands();
+    } else {
+        process_rule(&rule, &remake_file);
+        rule.run_build_commands();
+    }
 }
 
 fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
     let target_path = create_full_path_from_string(rule.target.clone());
     let target_modified = get_modified_time_from_path(&target_path);
-
-    if rule.dependencies.is_empty() {
-        return rule.run_build_commands();
-    }
 
     for dependency in &rule.dependencies {
         let dependency_path = create_full_path_from_string(dependency.clone());
@@ -85,7 +86,6 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
             for dep_rule in &remake_file.rules {
                 if dep_rule.target.eq(dependency) {
                     process_rule(&dep_rule, remake_file);
-                    rule.run_build_commands();
                 }
             }
         } else {
