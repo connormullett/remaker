@@ -44,11 +44,19 @@ impl RemakeRule {
                     wildcard.symbol.as_str(),
                     wildcard.values_as_string().as_str(),
                 );
+
                 command = command.replace("$@", self.target.as_str());
-                command = command.replace("$^", &self.dependencies_as_string())
+                command = command.replace("$^", &self.dependencies_as_string());
+
+                self.target = self.target.replace(
+                    wildcard.symbol.as_str(),
+                    wildcard.values_as_string().as_str(),
+                );
             }
+
             commands.push(command.clone())
         }
+
         self.build_commands = commands;
         self.clone()
     }
@@ -120,5 +128,13 @@ impl RemakeFile {
             new_rules.push(rule.expand_wildcards(&self.wildcards));
         }
         self.rules = new_rules
+    }
+
+    #[allow(dead_code)]
+    pub fn create_new_rules_from_placeholders(&mut self) {
+        // iterate through rules
+        // check if rule has % placeholder
+        // create a copy of the rule for each match in the directory
+        // add it to the rules, remove the placeholder rule
     }
 }

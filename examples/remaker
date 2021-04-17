@@ -5,7 +5,7 @@ CLEAN_FILES=foo.o main
 OBJS=foo.o math.o
 BIN=main
 
-main: math.o foo.o
+BIN: OBJS
     CC CFLAGS $^ -o $@
 
 foo.o: foo.c

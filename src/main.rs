@@ -81,13 +81,13 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
     for dependency in &rule.dependencies {
         let dependency_path = create_full_path_from_string(dependency.clone());
         let dependency_modified = get_modified_time_from_path(&dependency_path);
-
         if target_modified >= dependency_modified {
             for dep_rule in &remake_file.rules {
                 if dep_rule.target.eq(dependency) {
                     process_rule(&dep_rule, remake_file);
                 }
             }
+            error_and_die(format!("'{}' has no defined rule. exiting", dependency));
         } else {
             rule.run_build_commands();
         }
