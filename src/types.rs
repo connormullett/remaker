@@ -131,7 +131,7 @@ impl RemakeWildcard {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RemakeFile {
     pub rules: Vec<RemakeRule>,
     pub wildcards: Vec<RemakeWildcard>,

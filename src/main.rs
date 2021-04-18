@@ -1,11 +1,14 @@
 use std::{
+    io::Write,
     path::{Path, PathBuf},
+    thread,
     time::SystemTime,
 };
 
 use std::{env, fs, io, process};
 
 use clap::{App, Arg};
+use serde_json;
 use types::{RemakeFile, RemakeRule};
 
 extern crate pest;
@@ -128,25 +131,48 @@ fn main() {
         }
     };
 
-    let remake_file_contents = match fs::read_to_string(&remake_file_path) {
-        Ok(content) => content,
-        Err(_) => {
-            return error_and_die(format!(
-                "error reading file '{}'",
-                remake_file_path.to_string_lossy()
-            ))
-        }
-    };
+    let remake_file_mod = get_modified_time_from_path(&remake_file_path);
+    let remake_lock_file_mod = get_modified_time_from_path(&PathBuf::from("remake-lock.json"));
 
-    let mut remake_file = parse::parse(&remake_file_contents);
+    if remake_file_mod > remake_lock_file_mod {
+        let remake_file_contents = match fs::read_to_string(&remake_file_path) {
+            Ok(content) => content,
+            Err(_) => {
+                return error_and_die(format!(
+                    "error reading file '{}'",
+                    remake_file_path.to_string_lossy()
+                ))
+            }
+        };
 
-    remake_file.create_new_rules_from_placeholders();
-    remake_file.handle_wildcards();
+        let mut remake_file = parse::parse(&remake_file_contents);
+        remake_file.create_new_rules_from_placeholders();
+        remake_file.handle_wildcards();
 
-    let default_rule = match matches.value_of("RULE") {
-        Some(value) => value.to_string(),
-        None => remake_file.rules[0].target.to_string(),
-    };
+        let remake_lock = remake_file.clone();
+        let handler = thread::spawn(move || {
+            let _ = serde_json::to_writer_pretty(
+                fs::File::create("remake-lock.json").unwrap(),
+                &remake_lock,
+            );
+        });
 
-    process_rules(default_rule, remake_file);
+        let default_rule = match matches.value_of("RULE") {
+            Some(value) => value.to_string(),
+            None => remake_file.rules[0].target.to_string(),
+        };
+
+        process_rules(default_rule, remake_file);
+        handler.join().unwrap();
+    } else {
+        let remake_lock_contents = fs::read_to_string("remake-lock.json").unwrap();
+        let remake_file: RemakeFile = serde_json::from_str(&remake_lock_contents).unwrap();
+
+        let default_rule = match matches.value_of("RULE") {
+            Some(value) => value.to_string(),
+            None => remake_file.rules[0].target.to_string(),
+        };
+
+        process_rules(default_rule, remake_file);
+    }
 }
