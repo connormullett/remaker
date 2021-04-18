@@ -39,6 +39,10 @@ impl RemakeRule {
         false
     }
 
+    fn get_all_matches_by_pattern(&self, command: &String) -> Vec<String> {
+        vec![]
+    }
+
     pub fn expand_wildcards(&mut self, wildcards: &[RemakeWildcard]) -> Self {
         let mut commands = Vec::new();
 
@@ -51,6 +55,21 @@ impl RemakeRule {
 
                 command = command.replace("$@", self.target.as_str());
                 command = command.replace("$^", &self.dependencies_as_string());
+
+                if command.contains('*') {
+                    let matches = self.get_all_matches_by_pattern(&command);
+                    let matches_as_string = matches.join(" ");
+
+                    command = command
+                        .split(' ')
+                        .map(|part| {
+                            if part.contains('*') {
+                                return part.replace(part, &matches_as_string).to_string();
+                            }
+                            part.to_string()
+                        })
+                        .collect();
+                }
 
                 self.target = self.target.replace(
                     wildcard.symbol.as_str(),

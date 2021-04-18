@@ -5,11 +5,13 @@ A make clone for linux in Rust.
 ## Installation
 Requires Rust
 
-Because of the current implementation (using the `fork` syscall), this tool is only availabe for Linux and potentially Mac. Windows uses `CreateProcess` to spawn processes. I haven't found something to help make this cross platform as of yet.
+Because of the current implementation (using the `fork` syscall), this tool is only availabe for Linux and potentially Mac (untested). Windows uses `CreateProcess` to spawn processes. I haven't found something to help make this cross platform as of yet.
 
 - `git clone https://github.com/connormullett/remaker.git`
 - `cd remaker`
 - `cargo install --path .`
+
+Then, you can use remake from the command line by invoking `remake`.
 
 ## Usage
 Remake uses roughly the same syntax as make. The big difference being wildcards/variabls are expanded by name, rather than with `${value}` syntax. Rules are not tab sensitive and can use tabs or as many spaces as desired.
@@ -54,8 +56,6 @@ clean:
 ```
 
 Remake will create a `remake-lock.json`. This file should NOT be edited. This file is used when the remaker file hasn't been changed before runs. This way, remake doesn't need to parse the remake file again. It just needs to deserialize the JSON to the appropriate struct and execute. When the remake file is updated, the remake-lock.json file will also be updated.
-
-Then, you can use remake from the command line by invoking `remake`.
 
 ## Currently Not Supported
 - conditionals
