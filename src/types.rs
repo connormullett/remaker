@@ -77,9 +77,12 @@ impl RemakeRule {
         self.clone()
     }
 
-    pub fn run_build_commands(&self) {
+    pub fn run_build_commands(&self, disable_output: bool) {
         for command in self.build_commands.clone() {
-            println!("{}", command);
+            if !disable_output {
+                println!("{}", command);
+            }
+
             let fork_result = unsafe { fork() };
 
             if let Ok(ForkResult::Child) = fork_result {

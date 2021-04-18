@@ -1,5 +1,4 @@
 use std::{
-    io::Write,
     path::{Path, PathBuf},
     thread,
     time::SystemTime,
@@ -55,7 +54,7 @@ fn create_full_path_from_string(name: String) -> PathBuf {
     out
 }
 
-fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
+fn process_rules(default_rule_name: String, remake_file: RemakeFile, disable_output: bool) {
     let mut default_rule: Option<RemakeRule> = None;
     for rule in remake_file.rules.iter() {
         if rule.target == default_rule_name {
@@ -70,14 +69,14 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile) {
     };
 
     if rule.dependencies.is_empty() {
-        rule.run_build_commands();
+        rule.run_build_commands(disable_output);
     } else {
-        process_rule(&rule, &remake_file);
-        rule.run_build_commands();
+        process_rule(&rule, &remake_file, disable_output);
+        rule.run_build_commands(disable_output);
     }
 }
 
-fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
+fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile, disable_output: bool) {
     let target_path = create_full_path_from_string(rule.target.clone());
     let target_modified = get_modified_time_from_path(&target_path);
 
@@ -87,14 +86,14 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile) {
         if target_modified >= dependency_modified {
             for dep_rule in &remake_file.rules {
                 if dep_rule.target.eq(dependency) {
-                    process_rule(&dep_rule, remake_file);
+                    process_rule(&dep_rule, remake_file, disable_output);
                 }
             }
             if !Path::new(dependency).exists() {
                 error_and_die(format!("'{}' has no defined rule. exiting", dependency));
             }
         } else {
-            rule.run_build_commands();
+            rule.run_build_commands(disable_output);
         }
     }
 }
@@ -112,6 +111,14 @@ fn main() {
                 .required(false),
         )
         .arg(
+            Arg::with_name("silent")
+                .short("s")
+                .long("silent")
+                .help("Disables recipe output if specified")
+                .takes_value(false)
+                .required(false),
+        )
+        .arg(
             Arg::with_name("RULE")
                 .help("specify an optional default rule")
                 .required(false)
@@ -120,6 +127,8 @@ fn main() {
         .get_matches();
 
     let defined_remake_file = matches.value_of("path");
+
+    let disable_output = matches.is_present("silent");
 
     let remake_file_path = match find_remake_file(defined_remake_file) {
         Ok(file) => file,
@@ -162,7 +171,7 @@ fn main() {
             None => remake_file.rules[0].target.to_string(),
         };
 
-        process_rules(default_rule, remake_file);
+        process_rules(default_rule, remake_file, disable_output);
         handler.join().unwrap();
     } else {
         let remake_lock_contents = fs::read_to_string("remake-lock.json").unwrap();
@@ -173,6 +182,6 @@ fn main() {
             None => remake_file.rules[0].target.to_string(),
         };
 
-        process_rules(default_rule, remake_file);
+        process_rules(default_rule, remake_file, disable_output);
     }
 }
