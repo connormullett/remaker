@@ -215,7 +215,5 @@ impl RemakeFile {
             .filter(|&rule| rule.target != ".PHONY")
             .map(|rule| rule.to_owned())
             .collect();
-
-        println!("rules {:#?}", self.rules);
     }
 }

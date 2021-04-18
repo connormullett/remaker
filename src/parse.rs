@@ -54,7 +54,7 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                     dependencies.push(value.as_str().to_string());
                 }
 
-                let is_phony = if ".PHONY" == target { true } else { false };
+                let is_phony = ".PHONY" == target;
 
                 current_rule = RemakeRule {
                     target: String::from(target),
