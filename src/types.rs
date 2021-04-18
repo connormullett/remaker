@@ -1,4 +1,4 @@
-use std::{env, ffi::CString, fs, path::PathBuf};
+use std::{env, ffi::CString, fs};
 
 use nix::{
     sys::wait::{waitpid, WaitStatus},
@@ -167,7 +167,17 @@ impl RemakeFile {
                         new_rule.dependencies = vec![new_dep.to_string_lossy().into()];
 
                         if rule.target.contains('%') {
-                            new_rule.target = new_dep.to_string_lossy().into();
+                            // foo.o -> foo -> foo.c
+                            // match = foo.o
+                            // dependency = %.o
+                            // target = %.c
+                            let file_match = entry.file_name().clone();
+                            let file_match = file_match
+                                .to_string_lossy()
+                                .replace(&dependency.replace("%", ""), "");
+                            let new_target = rule.target.replace("%", &file_match);
+
+                            new_rule.target = new_target;
                         }
 
                         self.rules.push(new_rule);
@@ -177,7 +187,5 @@ impl RemakeFile {
             }
             i += 1;
         }
-
-        println!("self.rules {:#?}", self.rules);
     }
 }
