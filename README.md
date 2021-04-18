@@ -24,17 +24,23 @@ CLEAN_FILES=foo.o main
 OBJS=foo.o math.o
 BIN=main
 
+# this is the default rule
 BIN: OBJS
+    # wildcards get replaced with their value
     CC CFLAGS $^ -o $@
 
+# expand similar rules with placeholders
 %.o: %.c
     CC CFLAGS -c $^ -o $@
 
+# run tests
 test:
     cargo $@
 
+# clean up all the object and executable files
 clean:
     rm OBJS BIN
+
 ```
 
 Remake will create a `remake-lock.json`. This file should NOT be edited. This file is used when the remaker file hasn't been changed before runs. This way, remake doesn't need to parse the remake file again. It just needs to deserialize the JSON to the appropriate struct and execute. When the remake file is updated, the remake-lock.json file will also be updated.
