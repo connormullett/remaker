@@ -1,11 +1,13 @@
 use std::{env, ffi::CString, fs};
 
+use serde::{Deserialize, Serialize};
+
 use nix::{
     sys::wait::{waitpid, WaitStatus},
     unistd::{execvp, fork, ForkResult},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RemakeRule {
     pub target: String,
     pub dependencies: Vec<String>,
@@ -105,7 +107,7 @@ impl RemakeRule {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RemakeWildcard {
     pub symbol: String,
     pub values: Vec<String>,
@@ -129,7 +131,7 @@ impl RemakeWildcard {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RemakeFile {
     pub rules: Vec<RemakeRule>,
     pub wildcards: Vec<RemakeWildcard>,
