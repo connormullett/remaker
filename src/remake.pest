@@ -6,6 +6,8 @@ digit = { '0'..'9' }
 ident = @{ (alpha | digit)+ }
 ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
+comment = _{ "#" ~ ident* }
+
 wildcard = { ident ~ "=" ~ (ident | ident_list)+ }
 
 target_line = { ident ~ ":" ~ (ident|ident_list)* }
@@ -14,6 +16,6 @@ build_command = @{ ident_list }
 
 remake_file = {
     SOI ~
-    ((wildcard | target_line | build_command)? ~ NEWLINE)* ~
+    ((wildcard | target_line | build_command | comment)? ~ NEWLINE)* ~
     EOI
 }
