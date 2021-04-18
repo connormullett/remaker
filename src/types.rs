@@ -150,8 +150,7 @@ impl RemakeFile {
     }
 
     pub fn create_new_rules_from_placeholders(&mut self) -> io::Result<()> {
-        let mut i = 0;
-        for rule in &self.rules.clone() {
+        for (i, rule) in self.rules.clone().into_iter().enumerate() {
             if rule.dependencies.is_empty() {
                 continue;
             }
@@ -173,10 +172,6 @@ impl RemakeFile {
                         new_rule.dependencies = vec![new_dep.to_string_lossy().into()];
 
                         if rule.target.contains('%') {
-                            // foo.o -> foo -> foo.c
-                            // match = foo.o
-                            // dependency = %.o
-                            // target = %.c
                             let file_match = entry.file_name().clone();
                             let file_match = file_match
                                 .to_string_lossy()
@@ -191,7 +186,6 @@ impl RemakeFile {
                     }
                 }
             }
-            i += 1;
         }
         Ok(())
     }
