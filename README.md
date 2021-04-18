@@ -57,7 +57,6 @@ Remake will create a `remake-lock.json`. This file should NOT be edited. This fi
 Then, you can use remake from the command line by invoking `remake`.
 
 ## Currently Not Supported
-- Phony rules
 - conditionals
 
 ## Want to help or see that I'm missing something above?
