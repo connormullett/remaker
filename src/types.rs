@@ -1,4 +1,4 @@
-use std::ffi::CString;
+use std::{env, ffi::CString, fs, path::PathBuf};
 
 use nix::{
     sys::wait::{waitpid, WaitStatus},
@@ -144,11 +144,40 @@ impl RemakeFile {
         self.rules = new_rules
     }
 
-    #[allow(dead_code)]
     pub fn create_new_rules_from_placeholders(&mut self) {
-        // iterate through rules
-        // check if rule has % placeholder
-        // create a copy of the rule for each match in the directory
-        // add it to the rules, remove the placeholder rule
+        let mut i = 0;
+        for rule in &self.rules.clone() {
+            if rule.dependencies.is_empty() {
+                continue;
+            }
+
+            let dependency = &rule.dependencies[0];
+
+            if dependency.contains('%') {
+                for entry in fs::read_dir(env::current_dir().unwrap()).unwrap() {
+                    let entry = entry.unwrap();
+
+                    if entry
+                        .file_name()
+                        .to_string_lossy()
+                        .contains(&dependency.replace('%', ""))
+                    {
+                        let mut new_rule = rule.clone();
+                        let new_dep = entry.file_name().clone();
+                        new_rule.dependencies = vec![new_dep.to_string_lossy().into()];
+
+                        if rule.target.contains('%') {
+                            new_rule.target = new_dep.to_string_lossy().into();
+                        }
+
+                        self.rules.push(new_rule);
+                        self.rules.remove(i);
+                    }
+                }
+            }
+            i += 1;
+        }
+
+        println!("self.rules {:#?}", self.rules);
     }
 }

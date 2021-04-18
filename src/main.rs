@@ -140,6 +140,7 @@ fn main() {
 
     let mut remake_file = parse::parse(&remake_file_contents);
 
+    remake_file.create_new_rules_from_placeholders();
     remake_file.handle_wildcards();
 
     let default_rule = match matches.value_of("RULE") {
