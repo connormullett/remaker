@@ -1,4 +1,4 @@
-use std::{env, ffi::CString, fs};
+use std::{env, ffi::CString, fs, io};
 
 use serde::{Deserialize, Serialize};
 
@@ -149,7 +149,7 @@ impl RemakeFile {
         self.rules = new_rules
     }
 
-    pub fn create_new_rules_from_placeholders(&mut self) {
+    pub fn create_new_rules_from_placeholders(&mut self) -> io::Result<()> {
         let mut i = 0;
         for rule in &self.rules.clone() {
             if rule.dependencies.is_empty() {
@@ -159,8 +159,9 @@ impl RemakeFile {
             let dependency = &rule.dependencies[0];
 
             if dependency.contains('%') {
-                for entry in fs::read_dir(env::current_dir().unwrap()).unwrap() {
-                    let entry = entry.unwrap();
+                let current_dir = env::current_dir()?;
+                for entry in fs::read_dir(current_dir)? {
+                    let entry = entry?;
 
                     if entry
                         .file_name()
@@ -192,5 +193,6 @@ impl RemakeFile {
             }
             i += 1;
         }
+        Ok(())
     }
 }

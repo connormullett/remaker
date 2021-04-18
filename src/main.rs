@@ -172,7 +172,14 @@ fn main() {
         };
 
         let mut remake_file = parse::parse(&remake_file_contents);
-        remake_file.create_new_rules_from_placeholders();
+        let io_result = remake_file.create_new_rules_from_placeholders();
+
+        if io_result.is_err() {
+            error_and_die(String::from(
+                "An unknown error occured while parsing the remake file",
+            ));
+        }
+
         remake_file.handle_wildcards();
 
         let remake_lock = remake_file.clone();
