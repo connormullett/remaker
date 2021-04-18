@@ -27,6 +27,16 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 let mut current_wildcard = RemakeWildcard::new();
                 current_wildcard.symbol = String::from(symbol);
 
+                let mut i = 0;
+                for wildcard in wildcards.clone() {
+                    if wildcard.symbol == current_wildcard.symbol {
+                        current_wildcard = wildcard;
+                        wildcards.remove(i);
+                        break;
+                    }
+                    i += 1;
+                }
+
                 for value in inner_rules {
                     current_wildcard.values.push(String::from(value.as_str()));
                 }

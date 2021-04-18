@@ -175,6 +175,8 @@ fn main() {
         remake_file.create_new_rules_from_placeholders();
         remake_file.handle_wildcards();
 
+        println!("wildcards {:#?}", remake_file.wildcards);
+
         let remake_lock = remake_file.clone();
         let handler = thread::spawn(move || {
             let _ = serde_json::to_writer_pretty(
