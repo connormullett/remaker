@@ -42,7 +42,7 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 let mut inner_rules = line.into_inner();
                 let target = inner_rules.next().unwrap().as_str();
                 let mut dependencies: Vec<String> = Vec::new();
-                while let Some(value) = inner_rules.next() {
+                for value in inner_rules {
                     dependencies.push(value.as_str().to_string());
                 }
                 current_rule = RemakeRule {

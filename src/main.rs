@@ -7,7 +7,6 @@ use std::{
 use std::{env, fs, io, process};
 
 use clap::{App, Arg};
-use serde_json;
 use types::{RemakeFile, RemakeRule};
 
 extern crate pest;
