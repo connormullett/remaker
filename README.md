@@ -27,10 +27,7 @@ BIN=main
 BIN: OBJS
     CC CFLAGS $^ -o $@
 
-foo.o: foo.c
-    CC CFLAGS -c $^ -o $@
-
-math.o: math.c
+%.o: %.c
     CC CFLAGS -c $^ -o $@
 
 test:
