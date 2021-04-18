@@ -136,6 +136,14 @@ fn main() {
                 .required(false),
         )
         .arg(
+            Arg::with_name("print_database")
+                .short("d")
+                .long("print-data-base")
+                .help("print remakes internal data structure")
+                .takes_value(false)
+                .required(false),
+        )
+        .arg(
             Arg::with_name("RULE")
                 .help("specify an optional default rule")
                 .required(false)
@@ -182,6 +190,10 @@ fn main() {
 
         remake_file.handle_wildcards();
 
+        if matches.is_present("print_database") {
+            println!("{:#?}", remake_file);
+        }
+
         let remake_lock = remake_file.clone();
         let handler = thread::spawn(move || {
             let _ = serde_json::to_writer_pretty(
@@ -200,6 +212,10 @@ fn main() {
     } else {
         let remake_lock_contents = fs::read_to_string("remake-lock.json").unwrap();
         let remake_file: RemakeFile = serde_json::from_str(&remake_lock_contents).unwrap();
+
+        if matches.is_present("print_database") {
+            println!("{:#?}", remake_file);
+        }
 
         let default_rule = match matches.value_of("RULE") {
             Some(value) => value.to_string(),
