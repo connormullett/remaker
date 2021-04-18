@@ -68,10 +68,28 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile, disable_out
     };
 
     if rule.dependencies.is_empty() {
-        rule.run_build_commands(disable_output);
-    } else {
+        return rule.run_build_commands(disable_output);
+    }
+
+    let target_path = create_full_path_from_string(rule.target.clone());
+    let target_modified = get_modified_time_from_path(&target_path);
+
+    let mut rerun = false;
+    for dep in &rule.dependencies {
+        let dependency_path = create_full_path_from_string(dep.clone());
+        let dependency_modified = get_modified_time_from_path(&dependency_path);
+
+        if target_modified <= dependency_modified {
+            rerun = true;
+            break;
+        }
+    }
+
+    if rerun {
         process_rule(&rule, &remake_file, disable_output);
         rule.run_build_commands(disable_output);
+    } else {
+        println!("'{}' is already up to date", rule.target);
     }
 }
 
