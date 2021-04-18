@@ -57,7 +57,6 @@ Then, you can use remake from the command line by invoking `remake`.
 ## Currently Not Supported
 - Phony rules
 - conditionals
-- appending values to variables
 
 ## Want to help or see that I'm missing something above?
 Send it my way in issues, or open a PR. Everyone is welcome to contribute.
