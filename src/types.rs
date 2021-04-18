@@ -39,8 +39,48 @@ impl RemakeRule {
         false
     }
 
-    fn get_all_matches_by_pattern(&self, command: &String) -> Vec<String> {
-        vec![]
+    fn get_all_matches_by_pattern(&self, command: &String) -> io::Result<String> {
+        // assume * is a prefix or a suffix
+        let mut pattern = None;
+        for part in command.split(' ') {
+            if part.contains('*') {
+                pattern = Some(part.replace("*", ""));
+            }
+        }
+
+        if pattern.is_none() {
+            // this shouldnt happen, if it does its magic
+            crate::error_and_die(String::new());
+        }
+
+        let pattern = pattern.unwrap();
+
+        let mut matches = Vec::new();
+        for entry in fs::read_dir(env::current_dir()?)? {
+            let entry = entry?;
+            if entry.file_name().to_string_lossy().contains(&pattern) {
+                let entry_as_string = entry.file_name().clone();
+                matches.push(entry_as_string);
+            }
+        }
+
+        let matches_as_string = matches
+            .iter()
+            .map(|value| value.to_string_lossy().to_string())
+            .collect::<Vec<String>>()
+            .join(" ");
+
+        let mut new_command = String::new();
+        for part in command.split(' ') {
+            if part.contains('*') {
+                new_command.push_str(&matches_as_string);
+            } else {
+                new_command.push_str(part);
+            }
+            new_command.push(' ');
+        }
+
+        Ok(new_command.trim().to_string())
     }
 
     pub fn expand_wildcards(&mut self, wildcards: &[RemakeWildcard]) -> Self {
@@ -57,18 +97,11 @@ impl RemakeRule {
                 command = command.replace("$^", &self.dependencies_as_string());
 
                 if command.contains('*') {
-                    let matches = self.get_all_matches_by_pattern(&command);
-                    let matches_as_string = matches.join(" ");
-
-                    command = command
-                        .split(' ')
-                        .map(|part| {
-                            if part.contains('*') {
-                                return part.replace(part, &matches_as_string).to_string();
-                            }
-                            part.to_string()
-                        })
-                        .collect();
+                    let result = self.get_all_matches_by_pattern(&command);
+                    if result.is_err() {
+                        crate::error_and_die(String::from("an error occurred"));
+                    }
+                    command = result.unwrap();
                 }
 
                 self.target = self.target.replace(
