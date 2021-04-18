@@ -202,7 +202,6 @@ impl RemakeFile {
                 if phony.dependencies[0] == rule.target {
                     let mut new_rule = rule.clone();
                     new_rule.is_phony = true;
-                    println!("new rule {:#?}", new_rule);
                     self.rules.remove(i);
                     self.rules.insert(i, new_rule);
                 }

@@ -1,9 +1,9 @@
 WHITESPACE = _{ " " | "\t" }
 
-alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" | "\"" | "/" | "*" | "$" | "^" | "@" | "%" }
+alpha = { 'a'..'z' | 'A'..'Z' | "." | "-" | "_" | "\"" | "/" | "*" | "$" | "^" | "@" | "%" | "," }
 digit = { '0'..'9' }
 
-ident = @{ (alpha | digit)+ }
+ident = @{ (alpha | digit )+ }
 ident_list = @{ !digit ~ ident ~ (" " ~ ident)+ }
 
 comment = _{ "#" ~ ident* }

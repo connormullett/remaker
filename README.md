@@ -33,7 +33,8 @@ CLEAN_FILES=foo.o main
 OBJS=foo.o math.o
 BIN=main
 
-# this is the default rule
+# This is a phony rule, phony rules are always ran
+.PHONY: BIN
 BIN: OBJS
     # wildcards get replaced with their value
     CC CFLAGS $^ -o $@
