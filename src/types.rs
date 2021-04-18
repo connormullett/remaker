@@ -12,6 +12,7 @@ pub struct RemakeRule {
     pub target: String,
     pub dependencies: Vec<String>,
     pub build_commands: Vec<String>,
+    pub is_phony: bool,
 }
 
 impl RemakeRule {
@@ -20,6 +21,7 @@ impl RemakeRule {
             target: String::new(),
             dependencies: vec![],
             build_commands: vec![],
+            is_phony: false,
         }
     }
 
@@ -187,6 +189,33 @@ impl RemakeFile {
                 }
             }
         }
+
         Ok(())
+    }
+
+    pub fn handle_phony_rules(&mut self) {
+        let rules = self.rules.clone();
+        let phony_rules: Vec<&RemakeRule> = rules.iter().filter(|&rule| rule.is_phony).collect();
+
+        for (i, rule) in rules.iter().enumerate() {
+            for &phony in phony_rules.iter() {
+                if phony.dependencies[0] == rule.target {
+                    let mut new_rule = rule.clone();
+                    new_rule.is_phony = true;
+                    println!("new rule {:#?}", new_rule);
+                    self.rules.remove(i);
+                    self.rules.insert(i, new_rule);
+                }
+            }
+        }
+
+        self.rules = self
+            .rules
+            .iter()
+            .filter(|&rule| rule.target != ".PHONY")
+            .map(|rule| rule.to_owned())
+            .collect();
+
+        println!("rules {:#?}", self.rules);
     }
 }

@@ -53,10 +53,14 @@ pub fn parse(remake_file_contents: &str) -> RemakeFile {
                 for value in inner_rules {
                     dependencies.push(value.as_str().to_string());
                 }
+
+                let is_phony = if ".PHONY" == target { true } else { false };
+
                 current_rule = RemakeRule {
                     target: String::from(target),
                     dependencies,
                     build_commands: vec![],
+                    is_phony,
                 };
                 first_rule = false;
             }

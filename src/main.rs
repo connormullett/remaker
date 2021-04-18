@@ -85,7 +85,7 @@ fn process_rules(default_rule_name: String, remake_file: RemakeFile, disable_out
         }
     }
 
-    if rerun {
+    if rerun || rule.is_phony {
         process_rule(&rule, &remake_file, disable_output);
         rule.run_build_commands(disable_output);
     } else {
@@ -100,7 +100,7 @@ fn process_rule(rule: &RemakeRule, remake_file: &RemakeFile, disable_output: boo
     for dependency in &rule.dependencies {
         let dependency_path = create_full_path_from_string(dependency.clone());
         let dependency_modified = get_modified_time_from_path(&dependency_path);
-        if target_modified >= dependency_modified {
+        if target_modified >= dependency_modified || rule.is_phony {
             for dep_rule in &remake_file.rules {
                 if dep_rule.target.eq(dependency) {
                     process_rule(&dep_rule, remake_file, disable_output);
@@ -189,6 +189,7 @@ fn main() {
         }
 
         remake_file.handle_wildcards();
+        remake_file.handle_phony_rules();
 
         if matches.is_present("print_database") {
             println!("{:#?}", remake_file);
