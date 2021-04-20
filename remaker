@@ -1,4 +1,5 @@
 CC=clang
+CAR = cargo
 CFLAGS=-g
 CLEAN_FILES=examples/foo.o examples/main
 OBJS=examples/foo.o examples/math.o
@@ -13,8 +14,17 @@ examples/foo.o: examples/foo.c
 examples/math.o: examples/math.c
     CC CFLAGS -c $^ -o $@
 
-test:
-    cargo $@
+.PHONY build
+build:
+    CAR clean
+    CAR $@ --release
+    CAR install --path .
+    @echo done
 
+test:
+    CAR $@
+
+.PHONY clean
 clean:
+    CAR $@
     rm OBJS BIN
