@@ -9,6 +9,7 @@ BIN=main
 .PHONY: BIN
 BIN: OBJS
     CC $^ -o $@
+    @echo done
 
 %.o: %.c
     CC -c $^ -o $@

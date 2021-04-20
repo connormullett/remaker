@@ -40,7 +40,6 @@ impl RemakeRule {
     }
 
     fn get_all_matches_by_pattern(&self, command: &String) -> io::Result<String> {
-        // assume * is a prefix or a suffix
         let mut pattern = None;
         for part in command.split(' ') {
             if part.contains('*') {
@@ -49,7 +48,6 @@ impl RemakeRule {
         }
 
         if pattern.is_none() {
-            // this shouldnt happen, if it does its magic
             crate::error_and_die(String::new());
         }
 
@@ -131,8 +129,13 @@ impl RemakeRule {
         self.clone()
     }
 
-    pub fn run_build_commands(&self, disable_output: bool) {
-        for command in self.build_commands.clone() {
+    pub fn run_build_commands(&self, mut disable_output: bool) {
+        for mut command in self.build_commands.clone() {
+            if command.starts_with("@") {
+                disable_output = true;
+                command = command.replace("@", "");
+            }
+
             if !disable_output {
                 println!("{}", command);
             }
