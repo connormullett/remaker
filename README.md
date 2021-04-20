@@ -57,8 +57,5 @@ clean:
 
 Remake will create a `remake-lock.json`. This file should NOT be edited. This file is used when the remaker file hasn't been changed before runs. This way, remake doesn't need to parse the remake file again. It just needs to deserialize the JSON to the appropriate struct and execute. When the remake file is updated, the remake-lock.json file will also be updated.
 
-## Currently Not Supported
-- conditionals
-
 ## Want to help or see that I'm missing something above?
 Send it my way in issues, or open a PR. Everyone is welcome to contribute.
