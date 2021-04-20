@@ -1,0 +1,20 @@
+CC=clang
+CFLAGS=-g
+CLEAN_FILES=examples/foo.o examples/main
+OBJS=examples/foo.o examples/math.o
+BIN=examples/main
+
+examples/main: examples/math.o examples/foo.o
+    CC CFLAGS $^ -o $@
+
+examples/foo.o: examples/foo.c
+    CC CFLAGS -c $^ -o $@
+
+examples/math.o: examples/math.c
+    CC CFLAGS -c $^ -o $@
+
+test:
+    cargo $@
+
+clean:
+    rm OBJS BIN

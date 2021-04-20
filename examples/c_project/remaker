@@ -1,0 +1,21 @@
+
+CC=clang
+CLEAN_FILES=foo.o math.o
+CLEAN_FILES=main
+OBJS=foo.o math.o
+BIN=main
+
+# .PHONY rules run unconditionally
+.PHONY: BIN
+BIN: OBJS
+    CC $^ -o $@
+
+%.o: %.c
+    CC -c $^ -o $@
+
+test:
+    cargo $@
+
+clean:
+    rm *.o BIN
+
