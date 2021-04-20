@@ -5,8 +5,6 @@ CLEAN_FILES=main
 OBJS=foo.o math.o
 BIN=main
 
-# .PHONY rules run unconditionally
-.PHONY: BIN
 BIN: OBJS
     CC $^ -o $@
     @echo done
@@ -14,6 +12,7 @@ BIN: OBJS
 %.o: %.c
     CC -c $^ -o $@
 
+.PHONY: test
 test:
     cargo $@
 
