@@ -5,8 +5,6 @@ A make clone for linux in Rust.
 ## Installation
 Requires Rust
 
-Because of the current implementation (using the `fork` syscall), this tool is only availabe for Linux and potentially Mac (untested). Windows uses `CreateProcess` to spawn processes. I haven't found something to help make this cross platform as of yet.
-
 - `git clone https://github.com/connormullett/remaker.git`
 - `cd remaker`
 - `cargo install --path .`
