@@ -1,11 +1,8 @@
-use std::{env, ffi::CString, fs, io};
+use std::{env, fs, io};
 
 use serde::{Deserialize, Serialize};
 
-use nix::{
-    sys::wait::{waitpid, WaitStatus},
-    unistd::{execvp, fork, ForkResult},
-};
+use std::process::Command;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RemakeRule {
@@ -140,25 +137,12 @@ impl RemakeRule {
                 println!("{}", command);
             }
 
-            let fork_result = unsafe { fork() };
+            let command: Vec<String> = command.split(" ").map(|value| value.to_string()).collect();
 
-            if let Ok(ForkResult::Child) = fork_result {
-                let args: Vec<CString> = command
-                    .split(' ')
-                    .map(|item| CString::new(item.as_bytes()).unwrap())
-                    .collect();
-                let _ = execvp(&args[0], &args);
+            let output = Command::new(&command[0]).args(&command[1..]).output();
+            if let Err(error) = output {
+                crate::error_and_die(error.to_string())
             }
-
-            if let Ok(ForkResult::Parent { child, .. }) = fork_result {
-                loop {
-                    match waitpid(child, None) {
-                        Ok(WaitStatus::Exited(_, _)) => break,
-                        Ok(WaitStatus::Signaled(_, _, _)) => break,
-                        _ => {}
-                    };
-                }
-            };
         }
     }
 
