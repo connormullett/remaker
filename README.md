@@ -9,7 +9,7 @@ Requires Rust
 - `cd remaker`
 - `cargo install --path .`
 
-Then, you can use remake from the command line by invoking `remake`.
+Then, you can use remake from the command line by invoking `remake`
 
 ## Usage
 Remake uses roughly the same syntax as make. The big difference being wildcards/variabls are expanded by name, rather than with `${value}` syntax. Rules are not tab sensitive and can use tabs or as many spaces as desired.
